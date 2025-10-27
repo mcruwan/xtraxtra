@@ -28,6 +28,14 @@ class University extends Model
     }
 
     /**
+     * Get the news submissions for the university.
+     */
+    public function newsSubmissions(): HasMany
+    {
+        return $this->hasMany(NewsSubmission::class);
+    }
+
+    /**
      * Scope a query to only include active universities.
      */
     public function scopeActive($query)

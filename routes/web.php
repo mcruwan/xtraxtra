@@ -9,6 +9,26 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Quick test route to verify test data exists
+Route::get('/test-credentials', function() {
+    $university = \App\Models\University::first();
+    $user = \App\Models\User::where('role', 'university_user')->first();
+    $news = \App\Models\NewsSubmission::count();
+    
+    return [
+        'university' => $university ? $university->name : 'None',
+        'user_email' => $user ? $user->email : 'None',
+        'user_password' => 'password',
+        'total_news' => $news,
+        'news_list' => \App\Models\NewsSubmission::with('university')->get()->map(fn($n) => [
+            'id' => $n->id,
+            'title' => $n->title,
+            'university' => $n->university->name,
+            'status' => $n->status,
+        ])->toArray(),
+    ];
+});
+
 // Public university registration
 Route::get('/university/register', [App\Http\Controllers\UniversityRegistrationController::class, 'create'])
     ->name('university.register.create');
@@ -40,11 +60,26 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('universities.approve');
     Route::post('/universities/{university}/reject', [App\Http\Controllers\Admin\UniversityController::class, 'reject'])
         ->name('universities.reject');
+    
+    // News submissions management
+    Route::get('/news', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'index'])
+        ->name('news.index');
+    Route::get('/news/{newsSubmission}', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'show'])
+        ->name('news.show');
+    Route::post('/news/{newsSubmission}/approve', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'approve'])
+        ->name('news.approve');
+    Route::post('/news/{newsSubmission}/reject', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'reject'])
+        ->name('news.reject');
+    Route::post('/news/bulk-approve', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'bulkApprove'])
+        ->name('news.bulk-approve');
 });
 
 // University routes
 Route::middleware(['auth', 'university_user'])->prefix('university')->name('university.')->group(function () {
     Route::get('/dashboard', [UniversityDashboardController::class, 'index'])->name('dashboard');
+    
+    // News submissions
+    Route::resource('news', App\Http\Controllers\University\NewsSubmissionController::class);
 });
 
 // Profile routes (accessible to all authenticated users)
