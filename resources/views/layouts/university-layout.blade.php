@@ -34,6 +34,9 @@
                                 <a href="{{ route('university.dashboard') }}" class="inline-flex items-center h-full px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('university.dashboard') ? 'border-white text-white font-semibold' : 'border-transparent text-blue-100 hover:text-white hover:border-blue-300' }} transition-all duration-150">
                                     {{ __('Dashboard') }}
                                 </a>
+                                <a href="{{ route('university.news.index') }}" class="inline-flex items-center h-full px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('university.news.*') ? 'border-white text-white font-semibold' : 'border-transparent text-blue-100 hover:text-white hover:border-blue-300' }} transition-all duration-150">
+                                    {{ __('News Submissions') }}
+                                </a>
                             </div>
                         </div>
 
@@ -98,6 +101,9 @@
                     <div class="pt-2 pb-3 space-y-1">
                         <a href="{{ route('university.dashboard') }}" class="block pl-3 pr-4 py-3 border-l-4 {{ request()->routeIs('university.dashboard') ? 'border-white text-white bg-brand-700/50 font-semibold' : 'border-transparent text-blue-100 hover:text-white hover:bg-brand-700/30 hover:border-blue-300' }} text-base transition duration-150 ease-in-out">
                             {{ __('Dashboard') }}
+                        </a>
+                        <a href="{{ route('university.news.index') }}" class="block pl-3 pr-4 py-3 border-l-4 {{ request()->routeIs('university.news.*') ? 'border-white text-white bg-brand-700/50 font-semibold' : 'border-transparent text-blue-100 hover:text-white hover:bg-brand-700/30 hover:border-blue-300' }} text-base transition duration-150 ease-in-out">
+                            {{ __('News Submissions') }}
                         </a>
                     </div>
 

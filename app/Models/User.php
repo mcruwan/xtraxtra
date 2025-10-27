@@ -60,6 +60,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the news submissions created by the user.
+     */
+    public function newsSubmissions()
+    {
+        return $this->hasMany(NewsSubmission::class);
+    }
+
+    /**
+     * Get the news submissions approved by the user.
+     */
+    public function approvedNewsSubmissions()
+    {
+        return $this->hasMany(NewsSubmission::class, 'approved_by');
+    }
+
+    /**
      * Check if user is super admin.
      */
     public function isSuperAdmin(): bool

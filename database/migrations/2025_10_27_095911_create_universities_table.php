@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('universities', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('domain')->nullable();
+            $table->string('contact_email');
+            $table->string('logo')->nullable();
+            $table->enum('status', ['pending', 'active', 'inactive'])->default('pending');
             $table->timestamps();
         });
     }
