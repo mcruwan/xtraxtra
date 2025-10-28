@@ -148,3 +148,4 @@ class NewsSubmissionController extends Controller
     }
 }
 
+
