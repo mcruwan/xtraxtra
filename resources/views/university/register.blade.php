@@ -38,7 +38,7 @@
                                        id="university_name" 
                                        name="university_name" 
                                        value="{{ old('university_name') }}"
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('university_name') border-red-500 @enderror" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('university_name') border-red-500 bg-red-50 @enderror" 
                                        placeholder="Enter university name" 
                                        required 
                                        autofocus>
@@ -56,7 +56,7 @@
                                        id="domain" 
                                        name="domain" 
                                        value="{{ old('domain') }}"
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('domain') border-red-500 @enderror" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('domain') border-red-500 bg-red-50 @enderror" 
                                        placeholder="e.g., university.edu">
                                 @error('domain')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -72,7 +72,7 @@
                                        id="contact_email" 
                                        name="contact_email" 
                                        value="{{ old('contact_email') }}"
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('contact_email') border-red-500 @enderror" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('contact_email') border-red-500 bg-red-50 @enderror" 
                                        placeholder="contact@university.edu" 
                                        required>
                                 @error('contact_email')
@@ -101,7 +101,7 @@
                                        id="admin_name" 
                                        name="admin_name" 
                                        value="{{ old('admin_name') }}"
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('admin_name') border-red-500 @enderror" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('admin_name') border-red-500 bg-red-50 @enderror" 
                                        placeholder="John Doe" 
                                        required>
                                 @error('admin_name')
@@ -118,7 +118,7 @@
                                        id="admin_email" 
                                        name="admin_email" 
                                        value="{{ old('admin_email') }}"
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('admin_email') border-red-500 @enderror" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('admin_email') border-red-500 bg-red-50 @enderror" 
                                        placeholder="admin@university.edu" 
                                        required>
                                 @error('admin_email')
@@ -134,7 +134,7 @@
                                 <input type="password" 
                                        id="admin_password" 
                                        name="admin_password" 
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('admin_password') border-red-500 @enderror" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('admin_password') border-red-500 bg-red-50 @enderror" 
                                        placeholder="••••••••" 
                                        required>
                                 @error('admin_password')
@@ -157,9 +157,9 @@
                         </div>
                     </div>
 
-                    <!-- Info Alert -->
-                    <div class="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50" role="alert">
-                        <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <!-- Info Alert - Flowbite -->
+                    <div id="alert-info" class="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-blue-100" role="alert">
+                        <svg class="flex-shrink-0 inline w-5 h-5 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                         </svg>
                         <span class="sr-only">Info</span>
@@ -174,7 +174,7 @@
                             ← Already have an account?
                         </a>
 
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 text-center inline-flex items-center">
+                        <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
