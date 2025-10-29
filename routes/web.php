@@ -86,6 +86,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('news.reject');
     Route::post('/news/bulk-approve', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'bulkApprove'])
         ->name('news.bulk-approve');
+    
+    // Settings management
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
+        ->name('settings.index');
+    Route::post('/settings/logo', [App\Http\Controllers\Admin\SettingsController::class, 'updateLogo'])
+        ->name('settings.logo.update');
+    Route::delete('/settings/logo', [App\Http\Controllers\Admin\SettingsController::class, 'removeLogo'])
+        ->name('settings.logo.remove');
+    Route::put('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])
+        ->name('settings.update');
 });
 
 // University routes
