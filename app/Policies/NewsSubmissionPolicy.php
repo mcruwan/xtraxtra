@@ -47,11 +47,12 @@ class NewsSubmissionPolicy
             return false;
         }
 
-        // University users can only edit their own university's submissions
-        // and only if status is draft or pending
+        // University users can edit their own university's submissions
+        // Can edit: draft, pending, approved, published
+        // Cannot edit: rejected (must create new submission instead)
         return $user->isUniversityUser() 
             && $user->university_id === $newsSubmission->university_id
-            && in_array($newsSubmission->status, ['draft', 'pending']);
+            && $newsSubmission->status !== 'rejected';
     }
 
     /**

@@ -22,16 +22,39 @@ class NewsSubmissionController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status');
+        $search = $request->get('search');
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        
+        // Validate sort direction
+        $sortDirection = in_array($sortDirection, ['asc', 'desc']) ? $sortDirection : 'desc';
+        
+        // Valid sortable columns
+        $sortableColumns = ['id', 'title', 'status', 'submitted_at', 'created_at'];
+        if (!in_array($sortBy, $sortableColumns)) {
+            $sortBy = 'created_at';
+        }
         
         $query = Auth::user()->university->newsSubmissions()
-            ->with(['user', 'categories', 'tags'])
-            ->latest();
+            ->with(['user', 'categories', 'tags']);
 
+        // Filter by status
         if ($status) {
             $query->where('status', $status);
         }
 
-        $newsSubmissions = $query->paginate(15);
+        // Search by title or excerpt
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        $query->orderBy($sortBy, $sortDirection);
+
+        $newsSubmissions = $query->paginate(15)->withQueryString();
 
         $stats = [
             'total' => Auth::user()->university->newsSubmissions()->count(),
@@ -42,7 +65,7 @@ class NewsSubmissionController extends Controller
             'rejected' => Auth::user()->university->newsSubmissions()->rejected()->count(),
         ];
 
-        return view('university.news.index', compact('newsSubmissions', 'stats', 'status'));
+        return view('university.news.index', compact('newsSubmissions', 'stats', 'status', 'search', 'sortBy', 'sortDirection'));
     }
 
     /**
@@ -150,10 +173,10 @@ class NewsSubmissionController extends Controller
         // Ensure user can only edit their university's submissions
         $this->authorize('update', $newsSubmission);
 
-        // Can't edit if approved, rejected, or published
-        if (in_array($newsSubmission->status, ['approved', 'rejected', 'published'])) {
+        // Only prevent editing rejected submissions
+        if ($newsSubmission->status === 'rejected') {
             return redirect()->route('university.news.show', $newsSubmission)
-                ->with('error', 'You cannot edit a submission that has been ' . $newsSubmission->status . '.');
+                ->with('error', 'You cannot edit a rejected submission. Please create a new submission instead.');
         }
 
         $categories = Category::orderBy('name')->get();
@@ -170,10 +193,10 @@ class NewsSubmissionController extends Controller
         // Ensure user can only update their university's submissions
         $this->authorize('update', $newsSubmission);
 
-        // Can't edit if approved, rejected, or published
-        if (in_array($newsSubmission->status, ['approved', 'rejected', 'published'])) {
+        // Can't edit if rejected
+        if ($newsSubmission->status === 'rejected') {
             return redirect()->route('university.news.show', $newsSubmission)
-                ->with('error', 'You cannot edit a submission that has been ' . $newsSubmission->status . '.');
+                ->with('error', 'You cannot edit a rejected submission. Please create a new submission instead.');
         }
 
         $data = $request->validated();
@@ -202,9 +225,24 @@ class NewsSubmissionController extends Controller
                 ->store('news-images', 'public');
         }
 
-        // Set submitted_at if status changed to pending
-        if (isset($data['status']) && $data['status'] === 'pending' && $newsSubmission->status === 'draft') {
+        // Track if this is editing an approved/published article
+        $wasApprovedOrPublished = in_array($newsSubmission->status, ['approved', 'published']);
+        
+        // If editing an approved or published article, mark as revision and return to pending
+        if ($wasApprovedOrPublished) {
+            $data['is_revision'] = true;
+            $data['previous_status'] = $newsSubmission->status;
+            $data['status'] = 'pending';
+            $data['last_edited_at'] = now();
             $data['submitted_at'] = now();
+            // Clear approval data since it needs re-approval
+            $data['approved_by'] = null;
+            $data['approved_at'] = null;
+        } else {
+            // Set submitted_at if status changed to pending from draft
+            if (isset($data['status']) && $data['status'] === 'pending' && $newsSubmission->status === 'draft') {
+                $data['submitted_at'] = now();
+            }
         }
 
         // Update news submission
@@ -240,9 +278,14 @@ class NewsSubmissionController extends Controller
             $newsSubmission->tags()->sync([]);
         }
 
-        $message = $newsSubmission->status === 'pending' 
-            ? 'News submission submitted for approval successfully!' 
-            : 'News submission updated successfully!';
+        // Set appropriate success message
+        if ($wasApprovedOrPublished) {
+            $message = 'Your changes have been saved and the article has been resubmitted for approval.';
+        } elseif ($newsSubmission->status === 'pending') {
+            $message = 'News submission submitted for approval successfully!';
+        } else {
+            $message = 'News submission updated successfully!';
+        }
 
         return redirect()->route('university.news.index')
             ->with('success', $message);
