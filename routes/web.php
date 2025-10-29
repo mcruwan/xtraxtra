@@ -9,6 +9,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Flowbite demo page
+Route::get('/demo-flowbite', function () {
+    return view('demo-flowbite');
+});
+
 // Quick test route to verify test data exists
 Route::get('/test-credentials', function() {
     $university = \App\Models\University::first();
@@ -86,6 +91,7 @@ Route::middleware(['auth', 'university_user'])->prefix('university')->name('univ
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/university', [ProfileController::class, 'updateUniversity'])->name('profile.university.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

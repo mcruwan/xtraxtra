@@ -22,7 +22,9 @@ class NewsSubmissionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $newsSubmissionId = $this->route('news_submission') ? $this->route('news_submission')->id : null;
+        // Get the news submission from route (parameter is 'news' for resource routes)
+        $newsSubmission = $this->route('news');
+        $newsSubmissionId = $newsSubmission ? (is_object($newsSubmission) ? $newsSubmission->id : $newsSubmission) : null;
 
         return [
             'title' => ['required', 'string', 'max:255'],

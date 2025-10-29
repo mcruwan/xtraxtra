@@ -1,84 +1,92 @@
 <x-university-layout>
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Page Header -->
-            <x-page-header title="Create News Submission" description="Submit news to be published on AppliedHE Xtra! Xtra!">
-                <x-slot name="actions">
-                    <a href="{{ route('university.news.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Back to List
-                    </a>
-                </x-slot>
-            </x-page-header>
+            <!-- Page Header - Flowbite -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Create News Submission</h1>
+                        <p class="mt-2 text-sm text-gray-600">
+                            Submit news to be published on AppliedHE Xtra! Xtra!
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('university.news.index') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Form -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Form - Flowbite Card -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
                 <form action="{{ route('university.news.store') }}" method="POST" enctype="multipart/form-data" id="news-form">
                     @csrf
 
                     <div class="p-6 space-y-6">
                         <!-- Title -->
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="title" class="block mb-2 text-sm font-medium text-gray-900">
                                 Title <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="title" id="title" value="{{ old('title') }}" required
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 @error('title') border-red-300 @enderror"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('title') border-red-500 bg-red-50 @enderror"
                                 placeholder="Enter news title">
                             @error('title')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Slug (Optional) -->
                         <div>
-                            <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="slug" class="block mb-2 text-sm font-medium text-gray-900">
                                 Slug <span class="text-gray-400 text-xs">(Optional - auto-generated from title)</span>
                             </label>
                             <input type="text" name="slug" id="slug" value="{{ old('slug') }}"
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 @error('slug') border-red-300 @enderror"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('slug') border-red-500 bg-red-50 @enderror"
                                 placeholder="news-url-slug">
                             @error('slug')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                            <p class="mt-1 text-xs text-gray-500">Used in the URL. Leave empty to auto-generate.</p>
+                            <p class="mt-2 text-xs text-gray-500">Used in the URL. Leave empty to auto-generate.</p>
                         </div>
 
                         <!-- Excerpt -->
                         <div>
-                            <label for="excerpt" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="excerpt" class="block mb-2 text-sm font-medium text-gray-900">
                                 Excerpt <span class="text-gray-400 text-xs">(Optional)</span>
                             </label>
                             <textarea name="excerpt" id="excerpt" rows="3"
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 @error('excerpt') border-red-300 @enderror"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('excerpt') border-red-500 bg-red-50 @enderror"
                                 placeholder="Brief summary of the news (max 500 characters)">{{ old('excerpt') }}</textarea>
                             @error('excerpt')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                            <p class="mt-1 text-xs text-gray-500">This will be used as the preview text in listings.</p>
+                            <p class="mt-2 text-xs text-gray-500">This will be used as the preview text in listings.</p>
                         </div>
 
                         <!-- Content -->
                         <div>
-                            <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="content" class="block mb-2 text-sm font-medium text-gray-900">
                                 Content <span class="text-red-500">*</span>
                             </label>
                             <textarea id="content" name="content" required>{{ old('content') }}</textarea>
                             @error('content')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Featured Image -->
                         <div>
-                            <label for="featured_image" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="featured_image" class="block mb-2 text-sm font-medium text-gray-900">
                                 Featured Image <span class="text-gray-400 text-xs">(Optional)</span>
                             </label>
                             <div class="flex items-center space-x-4">
-                                <label class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <label class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 cursor-pointer">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                     Choose Image
@@ -87,9 +95,9 @@
                                 <span id="file-name" class="text-sm text-gray-500">No file chosen</span>
                             </div>
                             @error('featured_image')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                            <p class="mt-1 text-xs text-gray-500">Recommended size: 1200x630px. Max 2MB.</p>
+                            <p class="mt-2 text-xs text-gray-500">Recommended size: 1200x630px. Max 2MB.</p>
                             <div id="image-preview" class="mt-4 hidden">
                                 <img src="" alt="Preview" class="max-w-sm rounded-lg border border-gray-200">
                             </div>
@@ -97,15 +105,15 @@
 
                         <!-- Categories -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">
                                 Categories <span class="text-gray-400 text-xs">(Select one or more)</span>
                             </label>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 @foreach($categories as $category)
-                                    <label class="flex items-start">
+                                    <label class="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                                         <input type="checkbox" name="categories[]" value="{{ $category->id }}" 
                                             {{ in_array($category->id, old('categories', [])) ? 'checked' : '' }}
-                                            class="mt-1 rounded border-gray-300 text-brand-600 focus:ring-brand-500">
+                                            class="w-4 h-4 mt-0.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
                                         <div class="ml-3">
                                             <span class="text-sm font-medium text-gray-900">{{ $category->name }}</span>
                                             @if($category->description)
@@ -116,13 +124,13 @@
                                 @endforeach
                             </div>
                             @error('categories')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Tags -->
                         <div>
-                            <label for="tag-input" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="tag-input" class="block mb-2 text-sm font-medium text-gray-900">
                                 Tags
                             </label>
                             
@@ -133,7 +141,7 @@
                                         type="text" 
                                         id="tag-input" 
                                         placeholder="Type a tag name..."
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         autocomplete="off"
                                     >
                                     <!-- Tag Suggestions Dropdown -->
@@ -142,7 +150,7 @@
                                 <button 
                                     type="button" 
                                     id="add-tag-btn"
-                                    class="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+                                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
@@ -158,31 +166,38 @@
                             <div id="tag-inputs"></div>
                             
                             @error('tags')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                             <p class="mt-2 text-xs text-gray-500">Add relevant tags to help categorize your news article.</p>
-                        </div>
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-                        <div class="text-sm text-gray-600">
-                            <span class="text-red-500">*</span> Required fields
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button type="submit" name="status" value="draft"
-                                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition">
-                                Save as Draft
-                            </button>
-                            <button type="submit" name="status" value="pending"
-                                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
-                                Submit for Review
-                            </button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
+        
+        <!-- Floating Action Bar -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        <span class="text-red-500">*</span> Required fields
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button type="submit" form="news-form" name="status" value="draft"
+                            class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 transition-colors">
+                            Save as Draft
+                        </button>
+                        <button type="submit" form="news-form" name="status" value="pending"
+                            class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
+                            Submit for Review
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Spacer to prevent content from being hidden behind floating bar -->
+        <div class="h-20"></div>
     </div>
 
     <!-- jQuery for Summernote -->
