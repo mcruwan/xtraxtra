@@ -1,30 +1,28 @@
-<x-university-layout>
+<x-admin-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Edit News Submission') }}
+        </h2>
+    </x-slot>
+
     <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Page Header - Flowbite -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between flex-wrap gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Create News Submission</h1>
-                        <p class="mt-2 text-sm text-gray-600">
-                            Submit news to be published on AppliedHE Xtra! Xtra!
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('university.news.index') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                            </svg>
-                            Back to List
-                        </a>
-                    </div>
-                </div>
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Back Button -->
+            <div class="mb-6">
+                <a href="{{ route('admin.news.show', $newsSubmission) }}" 
+                   class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to News Submission
+                </a>
             </div>
 
-            <!-- Form - Flowbite Card -->
-            <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
-                <form action="{{ route('university.news.store') }}" method="POST" enctype="multipart/form-data" id="news-form">
+            <!-- Main Form -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <form action="{{ route('admin.news.update', $newsSubmission) }}" method="POST" enctype="multipart/form-data" id="news-form">
                     @csrf
+                    @method('PUT')
 
                     <div class="p-6 space-y-6">
                         <!-- Title -->
@@ -32,7 +30,7 @@
                             <label for="title" class="block mb-2 text-sm font-medium text-gray-900">
                                 Title <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="title" id="title" value="{{ old('title') }}" required
+                            <input type="text" name="title" id="title" value="{{ old('title', $newsSubmission->title) }}" required
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('title') border-red-500 bg-red-50 @enderror"
                                 placeholder="Enter news title">
                             @error('title')
@@ -45,7 +43,7 @@
                             <label for="slug" class="block mb-2 text-sm font-medium text-gray-900">
                                 Slug <span class="text-gray-400 text-xs">(Optional - auto-generated from title)</span>
                             </label>
-                            <input type="text" name="slug" id="slug" value="{{ old('slug') }}"
+                            <input type="text" name="slug" id="slug" value="{{ old('slug', $newsSubmission->slug) }}"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('slug') border-red-500 bg-red-50 @enderror"
                                 placeholder="news-url-slug">
                             @error('slug')
@@ -61,7 +59,7 @@
                             </label>
                             <textarea name="excerpt" id="excerpt" rows="3"
                                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('excerpt') border-red-500 bg-red-50 @enderror"
-                                placeholder="Brief summary of the news (max 500 characters)">{{ old('excerpt') }}</textarea>
+                                placeholder="Brief summary of the news (max 500 characters)">{{ old('excerpt', $newsSubmission->excerpt) }}</textarea>
                             @error('excerpt')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -73,25 +71,37 @@
                             <label for="content" class="block mb-2 text-sm font-medium text-gray-900">
                                 Content <span class="text-red-500">*</span>
                             </label>
-                            <textarea id="content" name="content" required>{{ old('content') }}</textarea>
+                            <textarea name="content" id="content" rows="15"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('content') border-red-500 bg-red-50 @enderror"
+                                required>{{ old('content', $newsSubmission->content) }}</textarea>
                             @error('content')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
+                        <!-- Current Featured Image -->
+                        @if($newsSubmission->featured_image)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Current Featured Image</label>
+                                <img src="{{ Storage::url($newsSubmission->featured_image) }}" alt="{{ $newsSubmission->title }}" 
+                                    class="max-w-sm rounded-lg border border-gray-200">
+                            </div>
+                        @endif
+
                         <!-- Featured Image -->
                         <div>
-                            <label for="featured_image" class="block mb-2 text-sm font-medium text-gray-900">
-                                Featured Image <span class="text-gray-400 text-xs">(Optional)</span>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">
+                                {{ $newsSubmission->featured_image ? 'Replace Featured Image' : 'Featured Image' }} 
+                                <span class="text-gray-400 text-xs">(Optional)</span>
                             </label>
                             <div class="flex items-center space-x-4">
-                                <label class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 cursor-pointer">
+                                <button type="button" id="choose-image-btn" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 cursor-pointer transition-colors">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                     Choose Image
-                                    <input type="file" name="featured_image" id="featured_image" accept="image/*" class="sr-only" onchange="previewImage(event)">
-                                </label>
+                                </button>
+                                <input type="file" name="featured_image" id="featured_image" accept="image/*" class="hidden" onchange="previewImage(event)">
                                 <span id="file-name" class="text-sm text-gray-500">No file chosen</span>
                             </div>
                             @error('featured_image')
@@ -110,10 +120,10 @@
                             </label>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 @foreach($categories as $category)
-                                    <label class="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <label class="flex items-start p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer">
                                         <input type="radio" name="categories" value="{{ $category->id }}" 
-                                            {{ old('categories') == $category->id ? 'checked' : '' }}
-                                            class="w-4 h-4 mt-0.5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                                            {{ $newsSubmission->categories->pluck('id')->first() == $category->id ? 'checked' : '' }}
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
                                         <div class="ml-3">
                                             <span class="text-sm font-medium text-gray-900">{{ $category->name }}</span>
                                             @if($category->description)
@@ -150,7 +160,7 @@
                                 <button 
                                     type="button" 
                                     id="add-tag-btn"
-                                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                    class="px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
@@ -166,40 +176,60 @@
                             <div id="tag-inputs"></div>
                             
                             @error('tags')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                             <p class="mt-2 text-xs text-gray-500">Add relevant tags to help categorize your news article.</p>
+                        </div>
+
+                        <!-- Admin-only Note -->
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">Admin Edit</h3>
+                                    <div class="mt-2 text-sm text-blue-700">
+                                        <p>As an admin, you can edit this news article at any point. The last edited timestamp will be automatically updated.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
-        
-        <!-- Floating Action Bar -->
-        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex items-center justify-between">
-                    <div class="text-sm text-gray-600">
-                        <span class="text-red-500">*</span> Required fields
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button type="submit" form="news-form" name="status" value="draft"
-                            class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 transition-colors">
-                            Save as Draft
-                        </button>
-                        <button type="submit" form="news-form" name="status" value="pending"
-                            class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
-                            Submit for Review
-                        </button>
-                    </div>
+    </div>
+
+    <!-- Floating Action Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    <span class="text-red-500">*</span> Required fields
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ route('admin.news.show', $newsSubmission) }}" 
+                       class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit" form="news-form"
+                        class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Update Article
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Spacer to prevent content from being hidden behind floating bar -->
-        <div class="h-20"></div>
     </div>
-
+    
+    <!-- Spacer to prevent content from being hidden behind floating bar -->
+    <div class="h-20"></div>
+    
     <!-- jQuery for Summernote -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
@@ -216,8 +246,8 @@
         }
         
         .note-editor.note-frame:focus-within {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
         .note-toolbar {
@@ -249,94 +279,110 @@
     
     <script>
         (function() {
-            // Initialize tag management immediately
-            window.availableTags = @json($tags);
-            window.selectedTags = [];
+            // Store all available tags
+            const availableTags = @json($tags);
+            let selectedTags = @json($newsSubmission->tags);
             
-            // Add tag to selection
-            function addTag(tagName) {
-                const trimmedName = tagName.trim();
-                if (!trimmedName) {
-                    alert('Please enter a tag name!');
-                    return;
-                }
-                
-                // Check if already selected
-                const isSelected = window.selectedTags.some(t => 
-                    t.name.toLowerCase() === trimmedName.toLowerCase()
+            // Initialize Summernote editor
+            document.addEventListener('DOMContentLoaded', function() {
+                $('#content').summernote({
+                    height: 500,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video', 'hr']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+            });
+
+            // Check if tag is already selected
+            function isTagSelected(tagName) {
+                return selectedTags.some(tag => 
+                    tag.name.toLowerCase() === tagName.toLowerCase()
                 );
-                
-                if (isSelected) {
-                    alert('This tag is already added!');
-                    return;
-                }
-                
-                // Find existing tag or create new one
-                const existingTag = window.availableTags.find(t => 
-                    t.name.toLowerCase() === trimmedName.toLowerCase()
+            }
+
+            // Add tag
+            function addTag(tagName) {
+                // Check if tag exists in available tags
+                let existingTag = availableTags.find(tag => 
+                    tag.name.toLowerCase() === tagName.toLowerCase()
                 );
                 
                 if (existingTag) {
-                    window.selectedTags.push(existingTag);
+                    // Check if not already in selected tags
+                    if (!selectedTags.some(tag => tag.id === existingTag.id)) {
+                        selectedTags.push(existingTag);
+                    }
                 } else {
-                    window.selectedTags.push({
-                        id: 'new-' + Date.now(),
-                        name: trimmedName
-                    });
+                    // Create new tag (client-side only, server will create it)
+                    if (!selectedTags.some(tag => tag.name.toLowerCase() === tagName.toLowerCase())) {
+                        selectedTags.push({
+                            id: 'new-' + Date.now(),
+                            name: tagName
+                        });
+                    }
                 }
                 
                 updateTagDisplay();
                 updateHiddenInputs();
             }
-            
-            // Remove tag from selection
+
+            // Remove tag
             function removeTag(tagId) {
-                window.selectedTags = window.selectedTags.filter(t => t.id !== tagId);
+                selectedTags = selectedTags.filter(tag => tag.id !== tagId);
                 updateTagDisplay();
                 updateHiddenInputs();
             }
-            
-            // Update visual display
+
+            // Update tag display
             function updateTagDisplay() {
                 const tagDisplay = document.getElementById('tag-display');
-                if (!tagDisplay) return;
-                
                 tagDisplay.innerHTML = '';
                 
-                if (window.selectedTags.length === 0) {
+                if (selectedTags.length === 0) {
                     tagDisplay.innerHTML = '<span class="text-xs text-gray-500 flex items-center">No tags added yet. Type a tag name and click the + button to add.</span>';
                     return;
                 }
                 
-                window.selectedTags.forEach(tag => {
+                selectedTags.forEach(tag => {
                     const tagBadge = document.createElement('span');
-                    tagBadge.className = 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium bg-brand-100 text-brand-800 border border-brand-200 transition hover:bg-brand-200';
+                    tagBadge.className = 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200 transition hover:bg-blue-200';
                     
                     const tagText = document.createElement('span');
                     tagText.textContent = tag.name;
                     
                     const removeBtn = document.createElement('button');
                     removeBtn.type = 'button';
-                    removeBtn.className = 'flex-shrink-0 ml-1 hover:text-brand-900';
-                    removeBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                    removeBtn.className = 'flex-shrink-0 ml-1 hover:text-blue-900';
+                    removeBtn.innerHTML = `
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    `;
                     removeBtn.onclick = function() {
                         removeTag(tag.id);
                     };
                     
                     tagBadge.appendChild(tagText);
                     tagBadge.appendChild(removeBtn);
+                    tagBadge.setAttribute('data-tag-id', tag.id);
                     tagDisplay.appendChild(tagBadge);
                 });
             }
-            
+
             // Update hidden inputs for form submission
             function updateHiddenInputs() {
                 const tagInputs = document.getElementById('tag-inputs');
-                if (!tagInputs) return;
-                
                 tagInputs.innerHTML = '';
                 
-                window.selectedTags.forEach(tag => {
+                selectedTags.forEach(tag => {
                     const input = document.createElement('input');
                     input.type = 'hidden';
                     input.name = 'tag_names[]';
@@ -344,29 +390,23 @@
                     tagInputs.appendChild(input);
                 });
             }
-            
-            // Get suggestions for autocomplete
-            function getSuggestions(searchTerm) {
+
+            // Suggest tags based on input
+            function suggestTags(searchTerm) {
                 if (!searchTerm || searchTerm.length < 1) {
-                    return [];
+                    hideTagSuggestions();
+                    return;
                 }
                 
                 const term = searchTerm.toLowerCase();
-                return window.availableTags.filter(tag => 
-                    tag.name.toLowerCase().includes(term) && 
-                    !window.selectedTags.some(selected => selected.name.toLowerCase() === tag.name.toLowerCase())
-                ).slice(0, 10);
-            }
-            
-            // Show tag suggestions
-            function showSuggestions(searchTerm) {
                 const suggestionsContainer = document.getElementById('tag-suggestions');
-                if (!suggestionsContainer) return;
-                
-                const matches = getSuggestions(searchTerm);
+                const matches = availableTags.filter(tag => 
+                    tag.name.toLowerCase().includes(term) && 
+                    !isTagSelected(tag.name)
+                ).slice(0, 10);
                 
                 if (matches.length === 0) {
-                    suggestionsContainer.classList.add('hidden');
+                    hideTagSuggestions();
                     return;
                 }
                 
@@ -375,66 +415,66 @@
                     const item = document.createElement('div');
                     item.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm';
                     item.textContent = tag.name;
-                    item.onclick = function() {
+                    item.onclick = () => {
                         addTag(tag.name);
                         document.getElementById('tag-input').value = '';
-                        suggestionsContainer.classList.add('hidden');
+                        hideTagSuggestions();
                     };
                     suggestionsContainer.appendChild(item);
                 });
                 
                 suggestionsContainer.classList.remove('hidden');
             }
-            
-            // Wait for DOM to be ready
+
+            // Hide tag suggestions
+            function hideTagSuggestions() {
+                document.getElementById('tag-suggestions').classList.add('hidden');
+            }
+
+            // Initialize on page load
             document.addEventListener('DOMContentLoaded', function() {
+                updateTagDisplay();
+                updateHiddenInputs();
+                
                 const tagInput = document.getElementById('tag-input');
                 const addTagBtn = document.getElementById('add-tag-btn');
                 
-                if (!tagInput || !addTagBtn) {
-                    console.error('Tag input elements not found');
-                    return;
-                }
-                
-                // Button click handler
-                addTagBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const value = tagInput.value.trim();
-                    if (value) {
-                        addTag(value);
+                // Add tag when button is clicked
+                addTagBtn.addEventListener('click', function() {
+                    const tagName = tagInput.value.trim();
+                    
+                    if (tagName && !isTagSelected(tagName)) {
+                        addTag(tagName);
                         tagInput.value = '';
+                        hideTagSuggestions();
+                        tagInput.focus();
                     }
                 });
                 
-                // Enter key handler
-                tagInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const value = tagInput.value.trim();
-                        if (value) {
-                            addTag(value);
-                            tagInput.value = '';
-                        }
+                // Also add tag when Enter is pressed
+                tagInput.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        addTagBtn.click();
                     }
                 });
                 
                 // Show suggestions as user types
                 tagInput.addEventListener('input', function() {
-                    showSuggestions(this.value);
+                    suggestTags(this.value);
                 });
                 
                 // Hide suggestions when clicking outside
                 document.addEventListener('click', function(e) {
-                    const suggestions = document.getElementById('tag-suggestions');
-                    if (suggestions && !e.target.closest('#tag-input') && !e.target.closest('#tag-suggestions') && !e.target.closest('#add-tag-btn')) {
-                        suggestions.classList.add('hidden');
+                    if (!e.target.closest('#tag-input') && !e.target.closest('#tag-suggestions') && !e.target.closest('#add-tag-btn')) {
+                        hideTagSuggestions();
                     }
                 });
             });
-            
+        
         })();
         
-        // Image preview function (outside IIFE so it's globally accessible)
+        // Image preview function
         window.previewImage = function(event) {
             const file = event.target.files[0];
             const fileName = document.getElementById('file-name');
@@ -443,7 +483,7 @@
             if (!fileName || !preview) return;
             
             const previewImg = preview.querySelector('img');
-            
+
             if (file) {
                 fileName.textContent = file.name;
                 const reader = new FileReader();
@@ -460,23 +500,18 @@
             }
         };
         
-        // Initialize Summernote editor
+        // Ensure file upload button works
         document.addEventListener('DOMContentLoaded', function() {
-            $('#content').summernote({
-                height: 500,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['fontsize', ['fontsize']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'video', 'hr']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ]
-            });
+            const fileInput = document.getElementById('featured_image');
+            const chooseBtn = document.getElementById('choose-image-btn');
+            
+            if (chooseBtn && fileInput) {
+                chooseBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+            }
         });
     </script>
-</x-university-layout>
-
+</x-admin-layout>

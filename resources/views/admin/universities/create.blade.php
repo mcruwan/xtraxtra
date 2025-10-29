@@ -9,7 +9,7 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form method="POST" action="{{ route('admin.universities.store') }}">
+                    <form method="POST" action="{{ route('admin.universities.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <!-- University Name -->
@@ -31,6 +31,22 @@
                             <x-input-label for="contact_email" :value="__('Contact Email')" />
                             <x-text-input id="contact_email" class="block mt-1 w-full" type="email" name="contact_email" :value="old('contact_email')" required />
                             <x-input-error :messages="$errors->get('contact_email')" class="mt-2" />
+                        </div>
+
+                        <!-- Logo Upload -->
+                        <div class="mt-4">
+                            <x-input-label for="logo" :value="__('University Logo (optional)')" />
+                            <input type="file" id="logo" name="logo" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" accept="image/*" />
+                            <p class="mt-2 text-sm text-gray-500">Accepted formats: JPEG, PNG, JPG, GIF (Max 2MB)</p>
+                            <x-input-error :messages="$errors->get('logo')" class="mt-2" />
+                        </div>
+
+                        <!-- WordPress User ID -->
+                        <div class="mt-4">
+                            <x-input-label for="wordpress_user_id" :value="__('WordPress User ID (optional)')" />
+                            <x-text-input id="wordpress_user_id" class="block mt-1 w-full" type="text" name="wordpress_user_id" :value="old('wordpress_user_id')" placeholder="e.g., admin, editor, or user ID" />
+                            <p class="mt-2 text-sm text-gray-500">The WordPress user account to associate articles pushed from this university.</p>
+                            <x-input-error :messages="$errors->get('wordpress_user_id')" class="mt-2" />
                         </div>
 
                         <!-- Status -->

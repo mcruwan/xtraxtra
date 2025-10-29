@@ -10,15 +10,35 @@
             <!-- Welcome Section - Flowbite Header -->
             <div class="mb-8">
                 <div class="flex items-center justify-between flex-wrap gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-                            Welcome, {{ Auth::user()->university->name ?? 'University User' }}!
-                        </h1>
-                        <p class="mt-2 text-sm text-gray-600">
-                            Track your submissions, monitor performance, and gain insights into your news content.
-                        </p>
+                    <div class="flex items-center gap-4">
+                        @if(Auth::user()->university->logo)
+                            <img src="{{ asset('storage/' . Auth::user()->university->logo) }}" 
+                                 alt="{{ Auth::user()->university->name }} logo" 
+                                 class="h-16 w-auto object-contain">
+                        @else
+                            <div class="h-16 w-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                        @endif
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+                                Welcome, {{ Auth::user()->university->name ?? 'University User' }}!
+                            </h1>
+                            <p class="mt-2 text-sm text-gray-600">
+                                Track your submissions, monitor performance, and gain insights into your news content.
+                            </p>
+                        </div>
                     </div>
                     <div class="flex items-center gap-3">
+                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Profile Settings
+                        </a>
                         <a href="{{ route('university.news.create') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -235,8 +255,8 @@
                                     <th scope="col" class="px-6 py-3">Status</th>
                                     <th scope="col" class="px-6 py-3">Category</th>
                                     <th scope="col" class="px-6 py-3">Created</th>
-                                    <th scope="col" class="px-6 py-3">
-                                        <span class="sr-only">Actions</span>
+                                    <th scope="col" class="px-6 py-3 text-right">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
@@ -273,8 +293,13 @@
                                             {{ $news->created_at->diffForHumans() }}
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <a href="{{ route('university.news.show', $news) }}" class="font-medium text-blue-600 hover:underline">
-                                                View
+                                            <a href="{{ route('university.news.show', $news) }}" 
+                                               class="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors inline-flex items-center gap-2" 
+                                               title="View">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
                                             </a>
                                         </td>
                                     </tr>

@@ -56,6 +56,16 @@
                             </a>
                         </li>
 
+                        <!-- News Categories -->
+                        <li>
+                            <a href="{{ route('admin.categories.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
+                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.categories.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                </svg>
+                                <span class="ms-3">News Categories</span>
+                            </a>
+                        </li>
+
                         <!-- News Submissions -->
                         <li>
                             <a href="{{ route('admin.news.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.news.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">

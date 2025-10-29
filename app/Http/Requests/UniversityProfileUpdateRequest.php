@@ -27,6 +27,7 @@ class UniversityProfileUpdateRequest extends FormRequest
             'university_name' => ['required', 'string', 'max:255'],
             'domain' => ['nullable', 'string', 'max:255'],
             'contact_email' => ['required', 'email', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
         ];
     }
 
@@ -38,8 +39,10 @@ class UniversityProfileUpdateRequest extends FormRequest
         return [
             'university_name' => 'university name',
             'contact_email' => 'contact email',
+            'logo' => 'university logo',
         ];
     }
 }
+
 
 

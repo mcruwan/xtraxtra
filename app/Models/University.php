@@ -12,6 +12,7 @@ class University extends Model
         'domain',
         'contact_email',
         'logo',
+        'wordpress_user_id',
         'status',
     ];
 

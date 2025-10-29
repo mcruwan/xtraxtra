@@ -77,6 +77,70 @@ class NewsSubmissionController extends Controller
     }
 
     /**
+     * Show the form for editing a news submission
+     */
+    public function edit(NewsSubmission $newsSubmission)
+    {
+        $newsSubmission->load(['categories', 'tags']);
+        
+        $categories = \App\Models\Category::orderBy('name')->get();
+        $tags = \App\Models\Tag::orderBy('name')->get();
+        
+        return view('admin.news.edit', compact('newsSubmission', 'categories', 'tags'));
+    }
+
+    /**
+     * Update the specified news submission
+     */
+    public function update(\App\Http\Requests\AdminNewsEditRequest $request, NewsSubmission $newsSubmission)
+    {
+        $data = $request->validated();
+        
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            // Delete old image if exists
+            if ($newsSubmission->featured_image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($newsSubmission->featured_image);
+            }
+            
+            $data['featured_image'] = $request->file('featured_image')->store('news', 'public');
+        } else {
+            // Keep existing image if not updating
+            unset($data['featured_image']);
+        }
+        
+        // Auto-generate slug from title if empty
+        if (empty($data['slug']) || !$data['slug']) {
+            $data['slug'] = \Illuminate\Support\Str::slug($data['title']);
+        }
+        
+        // Set last_edited_at timestamp
+        $data['last_edited_at'] = now();
+        
+        $newsSubmission->update($data);
+
+        // Sync category (single category only) if provided
+        if (isset($data['categories']) && $data['categories']) {
+            $newsSubmission->categories()->sync([$data['categories']]);
+        }
+
+        // Sync tags if provided
+        if (isset($data['tag_names'])) {
+            $tags = collect($data['tag_names'])->map(function($tagName) {
+                return \App\Models\Tag::firstOrCreate(['name' => $tagName]);
+            })->pluck('id');
+            
+            $newsSubmission->tags()->sync($tags);
+        } else {
+            $newsSubmission->tags()->sync([]);
+        }
+
+        return redirect()
+            ->route('admin.news.show', $newsSubmission)
+            ->with('success', 'News article has been updated successfully!');
+    }
+
+    /**
      * Approve a news submission
      */
     public function approve(Request $request, NewsSubmission $newsSubmission)

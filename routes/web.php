@@ -59,6 +59,11 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
+    // Category management
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+    Route::post('/categories/bulk-delete', [App\Http\Controllers\Admin\CategoryController::class, 'bulkDelete'])
+        ->name('categories.bulk-delete');
+    
     // University management
     Route::resource('universities', App\Http\Controllers\Admin\UniversityController::class);
     Route::post('/universities/{university}/approve', [App\Http\Controllers\Admin\UniversityController::class, 'approve'])
@@ -71,6 +76,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('news.index');
     Route::get('/news/{newsSubmission}', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'show'])
         ->name('news.show');
+    Route::get('/news/{newsSubmission}/edit', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'edit'])
+        ->name('news.edit');
+    Route::put('/news/{newsSubmission}', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'update'])
+        ->name('news.update');
     Route::post('/news/{newsSubmission}/approve', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'approve'])
         ->name('news.approve');
     Route::post('/news/{newsSubmission}/reject', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'reject'])

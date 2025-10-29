@@ -9,7 +9,7 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
                 <div class="p-6">
-                    <form method="POST" action="{{ route('admin.universities.update', $university) }}" class="space-y-6">
+                    <form method="POST" action="{{ route('admin.universities.update', $university) }}" class="space-y-6" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -60,6 +60,45 @@
                                    placeholder="contact@university.edu" 
                                    required>
                             @error('contact_email')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Logo Upload -->
+                        <div>
+                            <label for="logo" class="block mb-2 text-sm font-medium text-gray-900">
+                                University Logo (optional)
+                            </label>
+                            @if($university->logo)
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-600 mb-2">Current Logo:</p>
+                                    <img src="{{ asset('storage/' . $university->logo) }}" alt="{{ $university->name }}" class="h-20 w-48 object-cover rounded-lg border border-gray-200">
+                                </div>
+                            @endif
+                            <input type="file" 
+                                   id="logo" 
+                                   name="logo" 
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('logo') border-red-500 @enderror" 
+                                   accept="image/*">
+                            <p class="mt-2 text-sm text-gray-500">Accepted formats: JPEG, PNG, JPG, GIF (Max 2MB)</p>
+                            @error('logo')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- WordPress User ID -->
+                        <div>
+                            <label for="wordpress_user_id" class="block mb-2 text-sm font-medium text-gray-900">
+                                WordPress User ID (optional)
+                            </label>
+                            <input type="text" 
+                                   id="wordpress_user_id" 
+                                   name="wordpress_user_id" 
+                                   value="{{ old('wordpress_user_id', $university->wordpress_user_id) }}"
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('wordpress_user_id') border-red-500 @enderror" 
+                                   placeholder="e.g., admin, editor, or user ID">
+                            <p class="mt-2 text-sm text-gray-500">The WordPress user account to associate articles pushed from this university.</p>
+                            @error('wordpress_user_id')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

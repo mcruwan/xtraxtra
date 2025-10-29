@@ -138,13 +138,13 @@
                         <!-- Categories -->
                         <div>
                             <label class="block mb-2 text-sm font-medium text-gray-900">
-                                Categories <span class="text-gray-400 text-xs">(Select one or more)</span>
+                                Category <span class="text-red-500">*</span>
                             </label>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 @foreach($categories as $category)
                                     <label class="flex items-start p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer">
-                                        <input type="checkbox" name="categories[]" value="{{ $category->id }}" 
-                                            {{ in_array($category->id, old('categories', $newsSubmission->categories->pluck('id')->toArray())) ? 'checked' : '' }}
+                                        <input type="radio" name="categories" value="{{ $category->id }}" 
+                                            {{ $newsSubmission->categories->pluck('id')->first() == $category->id ? 'checked' : '' }}
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
                                         <div class="ml-3">
                                             <span class="text-sm font-medium text-gray-900">{{ $category->name }}</span>
