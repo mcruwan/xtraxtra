@@ -37,7 +37,20 @@
                                     <svg class="w-5 h-5 text-orange-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
                                     </svg>
-                                    <p class="text-sm font-medium text-orange-800">This submission is pending your review</p>
+                                    <div>
+                                        <p class="text-sm font-medium text-orange-800">This submission is pending your review</p>
+                                        @if($newsSubmission->is_revision && $newsSubmission->previous_status)
+                                            <p class="text-xs text-orange-700 mt-1">
+                                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                                This is a revised version (was previously {{ ucfirst($newsSubmission->previous_status) }})
+                                                @if($newsSubmission->last_edited_at)
+                                                    - Edited on {{ $newsSubmission->last_edited_at->format('M d, Y \a\t h:i A') }}
+                                                @endif
+                                            </p>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         @elseif($newsSubmission->status === 'approved')
