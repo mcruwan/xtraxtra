@@ -117,9 +117,9 @@ class NewsSubmissionController extends Controller
         // Create news submission
         $newsSubmission = NewsSubmission::create($data);
 
-        // Attach categories
-        if ($request->has('categories')) {
-            $newsSubmission->categories()->sync($request->categories);
+        // Attach category (single category only)
+        if ($request->has('categories') && $request->categories) {
+            $newsSubmission->categories()->sync([$request->categories]);
         }
         
         // Handle tags - create new ones that don't exist
@@ -248,9 +248,9 @@ class NewsSubmissionController extends Controller
         // Update news submission
         $newsSubmission->update($data);
 
-        // Sync categories
-        if ($request->has('categories')) {
-            $newsSubmission->categories()->sync($request->categories);
+        // Sync category (single category only)
+        if ($request->has('categories') && $request->categories) {
+            $newsSubmission->categories()->sync([$request->categories]);
         } else {
             $newsSubmission->categories()->sync([]);
         }

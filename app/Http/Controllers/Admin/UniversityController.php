@@ -15,16 +15,32 @@ class UniversityController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
+        $search = $request->get('search', '');
         
-        $query = University::with('users')->latest();
+        $query = University::with('users')
+            ->withCount('newsSubmissions')
+            ->withCount(['newsSubmissions as pending_submissions_count' => function ($q) {
+                $q->where('status', 'pending');
+            }])
+            ->latest();
         
+        // Status filter
         if ($status !== 'all') {
             $query->where('status', $status);
         }
         
+        // Search filter
+        if ($search !== '') {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('domain', 'like', "%{$search}%")
+                  ->orWhere('contact_email', 'like', "%{$search}%");
+            });
+        }
+        
         $universities = $query->paginate(15);
         
-        return view('admin.universities.index', compact('universities', 'status'));
+        return view('admin.universities.index', compact('universities', 'status', 'search'));
     }
 
     /**
@@ -44,8 +60,15 @@ class UniversityController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:universities,name'],
             'domain' => ['nullable', 'string', 'max:255'],
             'contact_email' => ['required', 'email', 'max:255'],
+            'wordpress_user_id' => ['nullable', 'string', 'max:255'],
             'status' => ['required', 'in:pending,active,inactive'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('university-logos', 'public');
+        }
 
         University::create($validated);
 
@@ -59,8 +82,18 @@ class UniversityController extends Controller
     public function show(University $university)
     {
         $university->load('users');
+        $newsArticles = $university->newsSubmissions()->latest()->limit(10)->get();
         
-        return view('admin.universities.show', compact('university'));
+        // Calculate article statistics
+        $articleStats = [
+            'total' => $university->newsSubmissions()->count(),
+            'pending' => $university->newsSubmissions()->where('status', 'pending')->count(),
+            'approved' => $university->newsSubmissions()->where('status', 'approved')->count(),
+            'published' => $university->newsSubmissions()->where('status', 'published')->count(),
+            'rejected' => $university->newsSubmissions()->where('status', 'rejected')->count(),
+        ];
+        
+        return view('admin.universities.show', compact('university', 'newsArticles', 'articleStats'));
     }
 
     /**
@@ -80,8 +113,19 @@ class UniversityController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:universities,name,' . $university->id],
             'domain' => ['nullable', 'string', 'max:255'],
             'contact_email' => ['required', 'email', 'max:255'],
+            'wordpress_user_id' => ['nullable', 'string', 'max:255'],
             'status' => ['required', 'in:pending,active,inactive'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if it exists
+            if ($university->logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($university->logo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($university->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('university-logos', 'public');
+        }
 
         $university->update($validated);
 

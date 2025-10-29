@@ -48,29 +48,50 @@
                 </div>
             @endif
 
+            <!-- Search Bar -->
+            <div class="mb-6">
+                <form action="{{ route('admin.universities.index') }}" method="GET" class="flex items-center">
+                    <label for="search" class="sr-only">Search universities</label>
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            </svg>
+                        </div>
+                        <input type="text" name="search" id="search" value="{{ request('search') }}" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search universities...">
+                    </div>
+                    <button type="submit" class="p-2.5 ml-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                        </svg>
+                        <span class="sr-only">Search</span>
+                    </button>
+                </form>
+            </div>
+
             <!-- Filter Tabs - Flowbite Tabs -->
             <div class="mb-6">
                 <ul class="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200">
                     <li class="me-2">
-                        <a href="{{ route('admin.universities.index', ['status' => 'all']) }}" 
+                        <a href="{{ route('admin.universities.index', ['status' => 'all', 'search' => request('search')]) }}" 
                            class="inline-block p-4 {{ $status === 'all' ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ $status === 'all' ? 'page' : 'false' }}">
                             All
                         </a>
                     </li>
                     <li class="me-2">
-                        <a href="{{ route('admin.universities.index', ['status' => 'pending']) }}" 
+                        <a href="{{ route('admin.universities.index', ['status' => 'pending', 'search' => request('search')]) }}" 
                            class="inline-block p-4 {{ $status === 'pending' ? 'text-orange-600 border-b-2 border-orange-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ $status === 'pending' ? 'page' : 'false' }}">
                             Pending
                         </a>
                     </li>
                     <li class="me-2">
-                        <a href="{{ route('admin.universities.index', ['status' => 'active']) }}" 
+                        <a href="{{ route('admin.universities.index', ['status' => 'active', 'search' => request('search')]) }}" 
                            class="inline-block p-4 {{ $status === 'active' ? 'text-green-600 border-b-2 border-green-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ $status === 'active' ? 'page' : 'false' }}">
                             Active
                         </a>
                     </li>
                     <li class="me-2">
-                        <a href="{{ route('admin.universities.index', ['status' => 'inactive']) }}" 
+                        <a href="{{ route('admin.universities.index', ['status' => 'inactive', 'search' => request('search')]) }}" 
                            class="inline-block p-4 {{ $status === 'inactive' ? 'text-gray-600 border-b-2 border-gray-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" aria-current="{{ $status === 'inactive' ? 'page' : 'false' }}">
                             Inactive
                         </a>
@@ -85,19 +106,22 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3">
+                                    Logo
+                                </th>
+                                <th scope="col" class="px-6 py-3">
                                     University
                                 </th>
                                 <th scope="col" class="px-6 py-3">
                                     Contact
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Users
+                                    Articles
                                 </th>
                                 <th scope="col" class="px-6 py-3">
                                     Status
                                 </th>
-                                <th scope="col" class="px-6 py-3">
-                                    <span class="sr-only">Actions</span>
+                                <th scope="col" class="px-6 py-3 text-right">
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -105,16 +129,29 @@
                             @foreach($universities as $university)
                                 <tr class="bg-white border-b hover:bg-gray-50">
                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $university->name }}</div>
+                                        @if($university->logo)
+                                            <div class="w-24 h-16 border border-gray-200 rounded bg-gray-50 flex items-center justify-center overflow-hidden">
+                                                <img src="{{ asset('storage/' . $university->logo) }}" alt="{{ $university->name }} Logo" class="max-w-full max-h-full object-contain">
+                                            </div>
+                                        @else
+                                            <div class="w-24 h-16 border border-gray-300 rounded bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-semibold">
+                                                {{ substr($university->name, 0, 1) }}
+                                            </div>
+                                        @endif
+                                    </th>
+                                    <td class="px-6 py-4">
+                                        <a href="{{ route('admin.universities.show', $university) }}" class="text-gray-900 hover:text-gray-600 transition-colors">
+                                            <div class="text-sm font-medium">{{ $university->name }}</div>
+                                        </a>
                                         @if($university->domain)
                                             <div class="text-sm text-gray-500">{{ $university->domain }}</div>
                                         @endif
-                                    </th>
+                                    </td>
                                     <td class="px-6 py-4">
                                         {{ $university->contact_email }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ $university->users->count() }}
+                                        {{ $university->news_submissions_count }} ({{ $university->pending_submissions_count }} pending)
                                     </td>
                                     <td class="px-6 py-4">
                                         <x-status-badge :status="$university->status" />
@@ -122,21 +159,34 @@
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex items-center justify-end gap-3">
                                             @if($university->status === 'pending')
-                                                <form method="POST" action="{{ route('admin.universities.approve', $university) }}" class="inline">
+                                                <form method="POST" action="{{ route('admin.universities.approve', $university) }}" class="inline" onsubmit="return confirm('Approve this university?')">
                                                     @csrf
-                                                    <button type="submit" class="font-medium text-green-600 hover:underline" onclick="return confirm('Approve this university?')">
-                                                        Approve
+                                                    <button type="submit" class="text-green-600 hover:text-green-900 transition-colors" title="Approve">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
                                                     </button>
                                                 </form>
-                                                <form method="POST" action="{{ route('admin.universities.reject', $university) }}" class="inline">
+                                                <form method="POST" action="{{ route('admin.universities.reject', $university) }}" class="inline" onsubmit="return confirm('Reject and delete this university?')">
                                                     @csrf
-                                                    <button type="submit" class="font-medium text-red-600 hover:underline" onclick="return confirm('Reject and delete this university?')">
-                                                        Reject
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 transition-colors" title="Reject">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
                                                     </button>
                                                 </form>
                                             @endif
-                                            <a href="{{ route('admin.universities.show', $university) }}" class="font-medium text-blue-600 hover:underline">View</a>
-                                            <a href="{{ route('admin.universities.edit', $university) }}" class="font-medium text-blue-600 hover:underline">Edit</a>
+                                            <a href="{{ route('admin.universities.show', $university) }}" class="text-blue-600 hover:text-blue-900 transition-colors" title="View">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                            </a>
+                                            <a href="{{ route('admin.universities.edit', $university) }}" class="text-green-600 hover:text-green-900 transition-colors" title="Edit">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

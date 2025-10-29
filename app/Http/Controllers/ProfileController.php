@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -52,11 +53,25 @@ class ProfileController extends Controller
 
         // Update university information
         $university = $user->university;
-        $university->update([
+        $updateData = [
             'name' => $request->input('university_name'),
             'domain' => $request->input('domain'),
             'contact_email' => $request->input('contact_email'),
-        ]);
+        ];
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($university->logo && Storage::disk('public')->exists($university->logo)) {
+                Storage::disk('public')->delete($university->logo);
+            }
+
+            // Store new logo
+            $logoPath = $request->file('logo')->store('university-logos', 'public');
+            $updateData['logo'] = $logoPath;
+        }
+
+        $university->update($updateData);
 
         return Redirect::route('profile.edit')
             ->with('status', 'university-updated')
