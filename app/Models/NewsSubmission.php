@@ -24,12 +24,17 @@ class NewsSubmission extends Model
         'approved_at',
         'published_at',
         'wordpress_post_id',
+        'is_revision',
+        'previous_status',
+        'last_edited_at',
     ];
 
     protected $casts = [
         'submitted_at' => 'datetime',
         'approved_at' => 'datetime',
         'published_at' => 'datetime',
+        'last_edited_at' => 'datetime',
+        'is_revision' => 'boolean',
     ];
 
     /**
@@ -42,6 +47,23 @@ class NewsSubmission extends Model
         static::creating(function ($newsSubmission) {
             if (empty($newsSubmission->slug)) {
                 $newsSubmission->slug = Str::slug($newsSubmission->title);
+            }
+            // Set published_at when status is published
+            if ($newsSubmission->status === 'published' && !$newsSubmission->published_at) {
+                $newsSubmission->published_at = now();
+            }
+        });
+
+        // Automatically set published_at when status changes to published
+        static::updating(function ($newsSubmission) {
+            if ($newsSubmission->isDirty('status')) {
+                if ($newsSubmission->status === 'published' && !$newsSubmission->published_at) {
+                    $newsSubmission->published_at = now();
+                }
+                // Clear published_at if status changes away from published
+                if ($newsSubmission->status !== 'published' && $newsSubmission->published_at) {
+                    $newsSubmission->published_at = null;
+                }
             }
         });
     }
