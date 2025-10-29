@@ -9,6 +9,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Flowbite demo page
+Route::get('/demo-flowbite', function () {
+    return view('demo-flowbite');
+});
+
 // Quick test route to verify test data exists
 Route::get('/test-credentials', function() {
     $university = \App\Models\University::first();
