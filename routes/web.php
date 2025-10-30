@@ -101,6 +101,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         'destroy' => 'admin-users.destroy',
     ]);
     
+    // University user management
+    Route::resource('university-users', App\Http\Controllers\Admin\UniversityUserController::class)->names([
+        'index' => 'university-users.index',
+        'create' => 'university-users.create',
+        'store' => 'university-users.store',
+        'show' => 'university-users.show',
+        'edit' => 'university-users.edit',
+        'update' => 'university-users.update',
+        'destroy' => 'university-users.destroy',
+    ]);
+    Route::post('/university-users/{universityUser}/reset-password', [App\Http\Controllers\Admin\UniversityUserController::class, 'resetPassword'])
+        ->name('university-users.reset-password');
+    Route::post('/university-users/{universityUser}/generate-password', [App\Http\Controllers\Admin\UniversityUserController::class, 'generatePassword'])
+        ->name('university-users.generate-password');
+    
     // Settings management
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
         ->name('settings.index');
