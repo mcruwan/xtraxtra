@@ -66,9 +66,9 @@
                 <!-- Logo Preview -->
                 <div>
                     <p class="text-sm font-medium text-gray-700 mb-3">Current Logo</p>
-                    @if($user->university->logo_url)
+                    @if($user->university->logo)
                         <div class="relative w-full bg-gray-100 rounded-lg border border-gray-300 p-4 flex items-center justify-center" style="aspect-ratio: 4/3;">
-                            <img src="{{ $user->university->logo_url }}" 
+                            <img src="{{ asset('storage/' . $user->university->logo) }}" 
                                  alt="{{ $user->university->name }} logo" 
                                  class="max-w-full max-h-full object-contain">
                         </div>

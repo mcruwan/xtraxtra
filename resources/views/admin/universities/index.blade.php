@@ -129,9 +129,9 @@
                             @foreach($universities as $university)
                                 <tr class="bg-white border-b hover:bg-gray-50">
                                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                        @if($university->logo_url)
+                                        @if($university->logo)
                                             <div class="w-24 h-16 border border-gray-200 rounded bg-gray-50 flex items-center justify-center overflow-hidden">
-                                                <img src="{{ $university->logo_url }}" alt="{{ $university->name }} Logo" class="max-w-full max-h-full object-contain">
+                                                <img src="{{ asset('storage/' . $university->logo) }}" alt="{{ $university->name }} Logo" class="max-w-full max-h-full object-contain">
                                             </div>
                                         @else
                                             <div class="w-24 h-16 border border-gray-300 rounded bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-semibold">
