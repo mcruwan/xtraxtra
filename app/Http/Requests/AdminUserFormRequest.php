@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AdminUserFormRequest extends FormRequest
 {
@@ -20,7 +21,29 @@ class AdminUserFormRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('adminUser')?->id;
+        $adminUser = $this->route('adminUser');
+        
+        // Build the email unique rule
+        $emailRule = [
+            'required',
+            'string',
+            'email',
+            'max:255',
+        ];
+        
+        // Add unique validation - ignore current user if editing
+        if ($adminUser) {
+            // If it's an object (model instance), use it directly
+            // If it's a raw ID, convert to model or use ID
+            if (is_object($adminUser)) {
+                $emailRule[] = Rule::unique('users', 'email')->ignore($adminUser->id, 'id');
+            } else {
+                $emailRule[] = Rule::unique('users', 'email')->ignore($adminUser, 'id');
+            }
+        } else {
+            // Creating new user - must be unique
+            $emailRule[] = Rule::unique('users', 'email');
+        }
 
         $rules = [
             'name' => [
@@ -28,13 +51,7 @@ class AdminUserFormRequest extends FormRequest
                 'string',
                 'max:255',
             ],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                'unique:users,email' . ($userId ? ",$userId" : ''),
-            ],
+            'email' => $emailRule,
             'role' => [
                 'required',
                 'string',

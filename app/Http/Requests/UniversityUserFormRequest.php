@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UniversityUserFormRequest extends FormRequest
 {
@@ -20,7 +21,33 @@ class UniversityUserFormRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('universityUser')?->id;
+        // Get the user ID from route parameter
+        // For resource routes, the parameter name is 'universityUser'
+        $universityUser = $this->route('universityUser');
+        $userId = null;
+        
+        if ($universityUser) {
+            // Handle both model instance and raw ID
+            if (is_object($universityUser) && isset($universityUser->id)) {
+                $userId = $universityUser->id;
+            } elseif (is_numeric($universityUser)) {
+                $userId = $universityUser;
+            }
+        }
+        
+        // Fallback: get ID from URL segments if route binding didn't work
+        // URL format: /admin/university-users/{id}/...
+        if (!$userId) {
+            $segments = $this->segments();
+            // Look for 'university-users' and get the next segment
+            $index = array_search('university-users', $segments);
+            if ($index !== false && isset($segments[$index + 1])) {
+                $potentialId = $segments[$index + 1];
+                if (is_numeric($potentialId)) {
+                    $userId = (int)$potentialId;
+                }
+            }
+        }
 
         $rules = [
             'name' => [
@@ -33,7 +60,7 @@ class UniversityUserFormRequest extends FormRequest
                 'string',
                 'email',
                 'max:255',
-                'unique:users,email' . ($userId ? ",$userId" : ''),
+                $userId ? Rule::unique('users', 'email')->ignore($userId, 'id') : Rule::unique('users', 'email'),
             ],
             'university_id' => [
                 'required',
@@ -102,4 +129,5 @@ class UniversityUserFormRequest extends FormRequest
         ];
     }
 }
+
 
