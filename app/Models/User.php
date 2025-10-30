@@ -76,6 +76,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the tickets created by the user.
+     */
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'created_by');
+    }
+
+    /**
+     * Get the tickets assigned to the user (admin only).
+     */
+    public function assignedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'assigned_to');
+    }
+
+    /**
+     * Get the ticket messages created by the user.
+     */
+    public function ticketMessages()
+    {
+        return $this->hasMany(TicketMessage::class);
+    }
+
+    /**
      * Check if user is super admin.
      */
     public function isSuperAdmin(): bool

@@ -45,6 +45,14 @@ class University extends Model
     }
 
     /**
+     * Get the tickets for the university.
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    /**
      * Scope a query to only include active universities.
      */
     public function scopeActive($query)

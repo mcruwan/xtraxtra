@@ -51,6 +51,20 @@
                             </svg>
                             News Submissions
                         </a>
+                        <a href="{{ route('university.tickets.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.tickets.*') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            <span class="flex-1">Support</span>
+                            @php
+                                $unreadTicketsCount = \App\Models\Ticket::where('university_id', auth()->user()->university_id)
+                                    ->where('has_unread_reply', true)
+                                    ->count();
+                            @endphp
+                            @if($unreadTicketsCount > 0)
+                                <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">{{ $unreadTicketsCount }}</span>
+                            @endif
+                        </a>
                         <a href="{{ route('university.faqs.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.faqs.*') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -133,6 +147,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                     News Submissions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('university.tickets.index') }}" class="flex items-center gap-2 py-2 px-3 rounded {{ request()->routeIs('university.tickets.*') ? 'text-white bg-brand-700' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                    </svg>
+                                    Support
                                 </a>
                             </li>
                             <li>

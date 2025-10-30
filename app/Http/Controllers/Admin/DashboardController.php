@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\NewsSubmission;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -26,6 +27,13 @@ class DashboardController extends Controller
             'published_news' => NewsSubmission::where('status', 'published')->count(),
             'draft_news' => NewsSubmission::where('status', 'draft')->count(),
             'total_news' => NewsSubmission::count(),
+            
+            // Ticket stats
+            'open_tickets' => Ticket::open()->count(),
+            'in_progress_tickets' => Ticket::inProgress()->count(),
+            'resolved_tickets' => Ticket::resolved()->count(),
+            'closed_tickets' => Ticket::closed()->count(),
+            'total_tickets' => Ticket::count(),
         ];
 
         // Platform growth trends - Last 30 days

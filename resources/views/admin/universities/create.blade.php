@@ -52,10 +52,10 @@
                         <!-- Status -->
                         <div class="mt-4">
                             <x-input-label for="status" :value="__('Status')" />
-                            <select id="status" name="status" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                <option value="pending" {{ old('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active</option>
-                                <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <select id="status" name="status" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-gray-900 bg-white" required>
+                                <option value="pending" {{ old('status') === 'pending' ? 'selected' : '' }} class="text-gray-900">Pending</option>
+                                <option value="active" {{ old('status') === 'active' ? 'selected' : '' }} class="text-gray-900">Active</option>
+                                <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }} class="text-gray-900">Inactive</option>
                             </select>
                             <x-input-error :messages="$errors->get('status')" class="mt-2" />
                         </div>
