@@ -14,31 +14,31 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create first admin account
+        // Create first super admin account
         User::firstOrCreate(
             ['email' => 'suba@dyits.com.my'],
             [
                 'name' => 'Suba Admin',
                 'password' => Hash::make('NewAdmin@123'),
-                'role' => 'admin',
+                'role' => 'super_admin',
                 'status' => 'active',
                 'university_id' => null,
             ]
         );
 
-        // Create second admin account
+        // Create second super admin account
         User::firstOrCreate(
             ['email' => 'mcruwan@gmail.com'],
             [
                 'name' => 'Ruwan Admin',
                 'password' => Hash::make('NewAdmin@333'),
-                'role' => 'admin',
+                'role' => 'super_admin',
                 'status' => 'active',
                 'university_id' => null,
             ]
         );
 
-        $this->command->info('Admin accounts created successfully!');
+        $this->command->info('Super Admin accounts created successfully!');
         $this->command->info('Email: suba@dyits.com.my | Password: NewAdmin@123');
         $this->command->info('Email: mcruwan@gmail.com | Password: NewAdmin@333');
     }
