@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UniversityRegistrationRequest;
 use App\Models\University;
 use App\Models\User;
+use App\Models\Setting;
+use App\Notifications\UniversityRegistrationReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +38,7 @@ class UniversityRegistrationController extends Controller
             ]);
 
             // Create primary university admin user
-            User::create([
+            $adminUser = User::create([
                 'name' => $request->admin_name,
                 'email' => $request->admin_email,
                 'password' => Hash::make($request->admin_password),
@@ -44,6 +46,11 @@ class UniversityRegistrationController extends Controller
                 'role' => 'university_user',
                 'status' => 'pending', // Will be activated when university is approved
             ]);
+
+            // Send registration received email if enabled
+            if (Setting::get('enable_registration_received_notifications', '1') == '1') {
+                $adminUser->notify(new UniversityRegistrationReceived($university));
+            }
 
             DB::commit();
 

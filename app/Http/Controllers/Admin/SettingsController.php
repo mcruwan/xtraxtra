@@ -294,5 +294,265 @@ class SettingsController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update email templates
+     */
+    public function updateEmailTemplates(Request $request)
+    {
+        // Check if settings table exists
+        if (!Schema::hasTable('settings')) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Settings table does not exist. Please run the migration first.');
+        }
+
+        $request->validate([
+            'template_type' => 'required|in:approval,rejection,registration_received,registration_approved',
+            'enable_approval_notifications' => 'nullable|boolean',
+            'approval_email_subject' => 'nullable|string|max:500',
+            'approval_email_template' => 'nullable|string',
+            'enable_rejection_notifications' => 'nullable|boolean',
+            'rejection_email_subject' => 'nullable|string|max:500',
+            'rejection_email_template' => 'nullable|string',
+            'enable_registration_received_notifications' => 'nullable|boolean',
+            'registration_received_email_subject' => 'nullable|string|max:500',
+            'registration_received_email_template' => 'nullable|string',
+            'enable_registration_approved_notifications' => 'nullable|boolean',
+            'registration_approved_email_subject' => 'nullable|string|max:500',
+            'registration_approved_email_template' => 'nullable|string',
+        ], [
+            'approval_email_subject.max' => 'Email subject cannot exceed 500 characters.',
+            'rejection_email_subject.max' => 'Email subject cannot exceed 500 characters.',
+            'registration_received_email_subject.max' => 'Email subject cannot exceed 500 characters.',
+            'registration_approved_email_subject.max' => 'Email subject cannot exceed 500 characters.',
+        ]);
+
+        try {
+            // Update based on template type
+            if ($request->template_type === 'approval') {
+                // Update Enable/Disable Toggle
+                Setting::set(
+                    'enable_approval_notifications', 
+                    $request->has('enable_approval_notifications') ? '1' : '0', 
+                    'boolean', 
+                    'Enable email notifications when articles are approved'
+                );
+
+                // Update Email Subject
+                if ($request->filled('approval_email_subject')) {
+                    Setting::set('approval_email_subject', $request->approval_email_subject, 'text', 'Subject line for article approval emails');
+                }
+
+                // Update Email Template
+                if ($request->filled('approval_email_template')) {
+                    Setting::set('approval_email_template', $request->approval_email_template, 'textarea', 'HTML template for article approval emails');
+                }
+            } elseif ($request->template_type === 'rejection') {
+                // Update Enable/Disable Toggle
+                Setting::set(
+                    'enable_rejection_notifications', 
+                    $request->has('enable_rejection_notifications') ? '1' : '0', 
+                    'boolean', 
+                    'Enable email notifications when articles are rejected'
+                );
+
+                // Update Email Subject
+                if ($request->filled('rejection_email_subject')) {
+                    Setting::set('rejection_email_subject', $request->rejection_email_subject, 'text', 'Subject line for article rejection emails');
+                }
+
+                // Update Email Template
+                if ($request->filled('rejection_email_template')) {
+                    Setting::set('rejection_email_template', $request->rejection_email_template, 'textarea', 'HTML template for article rejection emails');
+                }
+            } elseif ($request->template_type === 'registration_received') {
+                // Update Enable/Disable Toggle
+                Setting::set(
+                    'enable_registration_received_notifications', 
+                    $request->has('enable_registration_received_notifications') ? '1' : '0', 
+                    'boolean', 
+                    'Enable email notifications when university registers'
+                );
+
+                // Update Email Subject
+                if ($request->filled('registration_received_email_subject')) {
+                    Setting::set('registration_received_email_subject', $request->registration_received_email_subject, 'text', 'Subject line for registration received emails');
+                }
+
+                // Update Email Template
+                if ($request->filled('registration_received_email_template')) {
+                    Setting::set('registration_received_email_template', $request->registration_received_email_template, 'textarea', 'HTML template for registration received emails');
+                }
+            } elseif ($request->template_type === 'registration_approved') {
+                // Update Enable/Disable Toggle
+                Setting::set(
+                    'enable_registration_approved_notifications', 
+                    $request->has('enable_registration_approved_notifications') ? '1' : '0', 
+                    'boolean', 
+                    'Enable email notifications when university is approved'
+                );
+
+                // Update Email Subject
+                if ($request->filled('registration_approved_email_subject')) {
+                    Setting::set('registration_approved_email_subject', $request->registration_approved_email_subject, 'text', 'Subject line for registration approved emails');
+                }
+
+                // Update Email Template
+                if ($request->filled('registration_approved_email_template')) {
+                    Setting::set('registration_approved_email_template', $request->registration_approved_email_template, 'textarea', 'HTML template for registration approved emails');
+                }
+            }
+
+            return redirect()
+                ->to(route('admin.settings.index') . '#email-templates')
+                ->with('success', 'Email template updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to update email template: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send test email for email templates
+     */
+    public function sendTestEmail(Request $request)
+    {
+        $request->validate([
+            'template_type' => 'required|in:approval,rejection,registration_received,registration_approved',
+            'recipient_email' => 'required|email',
+        ]);
+
+        try {
+            $recipientEmail = $request->recipient_email;
+            $templateType = $request->template_type;
+
+            // Get current user as sender
+            $user = auth()->user();
+            
+            // Create dummy data for template variables
+            $dummyData = $this->getDummyTemplateData($templateType);
+            
+            // Get email template and subject from settings
+            if ($templateType === 'approval') {
+                $emailTemplate = Setting::get('approval_email_template');
+                $emailSubject = Setting::get('approval_email_subject', 'News Submission Approved - {{article_title}}');
+            } elseif ($templateType === 'rejection') {
+                $emailTemplate = Setting::get('rejection_email_template');
+                $emailSubject = Setting::get('rejection_email_subject', 'News Submission Rejected - {{article_title}}');
+            } elseif ($templateType === 'registration_received') {
+                $emailTemplate = Setting::get('registration_received_email_template');
+                $emailSubject = Setting::get('registration_received_email_subject', 'Registration Received - {{university_name}}');
+            } elseif ($templateType === 'registration_approved') {
+                $emailTemplate = Setting::get('registration_approved_email_template');
+                $emailSubject = Setting::get('registration_approved_email_subject', 'Registration Approved - Welcome to {{platform_name}}!');
+            }
+
+            if (!$emailTemplate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email template not found. Please save the template first.',
+                ], 404);
+            }
+
+            // Parse template variables
+            $subject = $this->parseTestTemplate($emailSubject, $dummyData);
+            $htmlContent = $this->parseTestTemplate($emailTemplate, $dummyData);
+
+            // Check if Brevo API is configured
+            $brevoService = new \App\Services\BrevoMailService();
+            
+            if ($brevoService->isConfigured()) {
+                // Send via Brevo
+                $result = $brevoService->sendTransactionalEmail([
+                    'to' => [
+                        'email' => $recipientEmail,
+                        'name' => 'Test Recipient',
+                    ],
+                    'subject' => '[TEST] ' . $subject,
+                    'html_content' => $htmlContent,
+                    'tags' => ['test-email', $templateType],
+                ]);
+
+                if ($result['success']) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Test email sent successfully to ' . $recipientEmail,
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to send test email: ' . $result['message'],
+                    ], 500);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Brevo API is not configured. Please configure your Brevo API credentials in the Email & API settings.',
+                ], 400);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get dummy data for test email templates
+     */
+    private function getDummyTemplateData(string $templateType): array
+    {
+        $baseData = [
+            '{{platform_name}}' => Setting::get('platform_name', 'XtraXtra'),
+            '{{dashboard_url}}' => route('admin.settings.index') . '#email-templates',
+        ];
+
+        if ($templateType === 'approval' || $templateType === 'rejection') {
+            // Article-related templates
+            $baseData['{{user_name}}'] = 'John Doe';
+            $baseData['{{user_email}}'] = 'johndoe@example.com';
+            $baseData['{{article_title}}'] = 'Groundbreaking Research at University Lab';
+            $baseData['{{article_excerpt}}'] = 'Scientists at the university have made a significant discovery in renewable energy technology that could revolutionize the industry.';
+            $baseData['{{status}}'] = $templateType === 'approval' ? 'Approved' : 'Rejected';
+            $baseData['{{university_name}}'] = 'Example University';
+
+            if ($templateType === 'approval') {
+                $baseData['{{approved_at}}'] = now()->format('F j, Y \a\t g:i A');
+                $baseData['{{scheduled_at}}'] = now()->addDays(2)->format('F j, Y \a\t g:i A');
+                $baseData['{{approver_name}}'] = auth()->user()->name ?? 'Admin';
+            } else {
+                $baseData['{{rejection_reason}}'] = 'The article content needs more detailed research and additional sources to support the claims. Please revise and include at least 3 authoritative references.';
+                $baseData['{{rejected_at}}'] = now()->format('F j, Y \a\t g:i A');
+                $baseData['{{rejector_name}}'] = auth()->user()->name ?? 'Admin';
+            }
+        } elseif ($templateType === 'registration_received' || $templateType === 'registration_approved') {
+            // University registration-related templates
+            $baseData['{{university_name}}'] = 'Example University';
+            $baseData['{{admin_name}}'] = 'Jane Smith';
+            $baseData['{{admin_email}}'] = 'admin@exampleuniversity.edu';
+            $baseData['{{contact_email}}'] = 'contact@exampleuniversity.edu';
+
+            if ($templateType === 'registration_received') {
+                $baseData['{{registered_at}}'] = now()->format('F j, Y \a\t g:i A');
+            } else {
+                $baseData['{{approved_at}}'] = now()->format('F j, Y \a\t g:i A');
+                $baseData['{{login_url}}'] = route('login');
+            }
+        }
+
+        return $baseData;
+    }
+
+    /**
+     * Parse template with test data
+     */
+    private function parseTestTemplate(string $template, array $data): string
+    {
+        return str_replace(array_keys($data), array_values($data), $template);
+    }
 }
 

@@ -145,6 +145,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('settings.update-email-api');
     Route::post('/settings/test-brevo-api', [App\Http\Controllers\Admin\SettingsController::class, 'testBrevoApi'])
         ->name('settings.test-brevo-api');
+    Route::put('/settings/email-templates', [App\Http\Controllers\Admin\SettingsController::class, 'updateEmailTemplates'])
+        ->name('settings.update-email-templates');
+    Route::post('/settings/email-templates/send-test', [App\Http\Controllers\Admin\SettingsController::class, 'sendTestEmail'])
+        ->name('settings.send-test-email');
     
     // Impersonation
     Route::post('/impersonate/{university}', [App\Http\Controllers\Admin\ImpersonationController::class, 'impersonate'])
