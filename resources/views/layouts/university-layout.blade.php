@@ -28,7 +28,13 @@
                 <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
                     <!-- Logo -->
                     <a href="{{ route('university.dashboard') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <span class="self-center text-xl font-semibold whitespace-nowrap text-white">AppliedHE Xtra! Xtra!</span>
+                        @if(\App\Models\Setting::getLightLogo())
+                            <img src="{{ \App\Models\Setting::getLightLogo() }}" 
+                                 alt="AppliedHE Xtra! Xtra! Logo" 
+                                 class="h-12 w-auto object-contain py-1">
+                        @else
+                            <span class="self-center text-xl font-semibold whitespace-nowrap text-white">AppliedHE Xtra! Xtra!</span>
+                        @endif
                     </a>
 
                     <!-- Desktop Navigation Links -->
