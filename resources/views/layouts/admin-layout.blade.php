@@ -110,6 +110,22 @@
                             </a>
                         </li>
 
+                        <!-- Support Tickets -->
+                        <li>
+                            <a href="{{ route('admin.tickets.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.tickets.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
+                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.tickets.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                </svg>
+                                <span class="flex-1 ms-3 whitespace-nowrap">Support Tickets</span>
+                                @php
+                                    $openTicketsCount = \App\Models\Ticket::open()->count();
+                                @endphp
+                                @if($openTicketsCount > 0)
+                                    <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">{{ $openTicketsCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
                         <!-- FAQs -->
                         <li>
                             <a href="{{ route('admin.faqs.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.faqs.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">

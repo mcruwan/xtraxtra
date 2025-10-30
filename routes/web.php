@@ -90,6 +90,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // FAQ management
     Route::resource('faqs', App\Http\Controllers\Admin\FaqController::class);
     
+    // Ticket management
+    Route::get('/tickets', [App\Http\Controllers\Admin\TicketController::class, 'index'])
+        ->name('tickets.index');
+    Route::get('/tickets/{ticket}', [App\Http\Controllers\Admin\TicketController::class, 'show'])
+        ->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [App\Http\Controllers\Admin\TicketController::class, 'reply'])
+        ->name('tickets.reply');
+    Route::patch('/tickets/{ticket}/status', [App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])
+        ->name('tickets.update-status');
+    Route::patch('/tickets/{ticket}/priority', [App\Http\Controllers\Admin\TicketController::class, 'updatePriority'])
+        ->name('tickets.update-priority');
+    Route::patch('/tickets/{ticket}/assign', [App\Http\Controllers\Admin\TicketController::class, 'assign'])
+        ->name('tickets.assign');
+    Route::post('/tickets/bulk-update-status', [App\Http\Controllers\Admin\TicketController::class, 'bulkUpdateStatus'])
+        ->name('tickets.bulk-update-status');
+    
     // Admin user management (only super admins can manage)
     Route::resource('admin-users', App\Http\Controllers\Admin\AdminUserController::class)->names([
         'index' => 'admin-users.index',
@@ -141,6 +157,20 @@ Route::middleware(['auth', 'university_user'])->prefix('university')->name('univ
     
     // News submissions
     Route::resource('news', App\Http\Controllers\University\NewsSubmissionController::class);
+    
+    // Support Tickets
+    Route::get('/tickets', [App\Http\Controllers\University\TicketController::class, 'index'])
+        ->name('tickets.index');
+    Route::get('/tickets/create', [App\Http\Controllers\University\TicketController::class, 'create'])
+        ->name('tickets.create');
+    Route::post('/tickets', [App\Http\Controllers\University\TicketController::class, 'store'])
+        ->name('tickets.store');
+    Route::get('/tickets/{ticket}', [App\Http\Controllers\University\TicketController::class, 'show'])
+        ->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [App\Http\Controllers\University\TicketController::class, 'reply'])
+        ->name('tickets.reply');
+    Route::post('/tickets/{ticket}/close', [App\Http\Controllers\University\TicketController::class, 'close'])
+        ->name('tickets.close');
     
     // FAQs (read-only for universities - knowledge base)
     Route::get('/faqs', [App\Http\Controllers\University\FaqController::class, 'index'])->name('faqs.index');

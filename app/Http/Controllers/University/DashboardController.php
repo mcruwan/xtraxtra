@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\University;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -74,6 +75,16 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('university.dashboard', compact('stats', 'recentNews', 'trendData', 'categoryPerformance'));
+        // Ticket stats
+        $ticketStats = [
+            'total' => $university->tickets()->count(),
+            'open' => $university->tickets()->open()->count(),
+            'in_progress' => $university->tickets()->inProgress()->count(),
+            'resolved' => $university->tickets()->resolved()->count(),
+            'closed' => $university->tickets()->closed()->count(),
+            'unread_replies' => $university->tickets()->where('has_unread_reply', true)->count(),
+        ];
+
+        return view('university.dashboard', compact('stats', 'recentNews', 'trendData', 'categoryPerformance', 'ticketStats'));
     }
 }

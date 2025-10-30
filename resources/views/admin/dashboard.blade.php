@@ -28,8 +28,27 @@
             </div>
 
             <!-- Alert Notifications (Flowbite Alerts) -->
-            @if($stats['pending_universities'] > 0 || $stats['pending_news'] > 0)
+            @if($stats['pending_universities'] > 0 || $stats['pending_news'] > 0 || $stats['open_tickets'] > 0)
                 <div class="mb-8 space-y-4">
+                    @if($stats['open_tickets'] > 0)
+                        <div id="alert-tickets" class="flex items-center p-4 mb-4 text-green-800 rounded-lg bg-green-50" role="alert">
+                            <svg class="flex-shrink-0 w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            <span class="sr-only">Info</span>
+                            <div class="ms-3 text-sm font-medium flex-1">
+                                <span class="font-bold">{{ $stats['open_tickets'] }}</span> open support {{ Str::plural('ticket', $stats['open_tickets']) }} {{ $stats['open_tickets'] == 1 ? 'needs' : 'need' }} your attention.
+                                <a href="{{ route('admin.tickets.index', ['status' => 'open']) }}" class="font-semibold underline hover:no-underline ms-2">View tickets →</a>
+                            </div>
+                            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-tickets" aria-label="Close">
+                                <span class="sr-only">Close</span>
+                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+                    
                     @if($stats['pending_universities'] > 0)
                         <div id="alert-universities" class="flex items-center p-4 mb-4 text-yellow-800 rounded-lg bg-yellow-50" role="alert">
                             <svg class="flex-shrink-0 w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -396,6 +415,85 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- Support Tickets Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-gray-900">Support Tickets</h2>
+                        <a href="{{ route('admin.tickets.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
+                            View all
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        <!-- Total Tickets Card -->
+                        <a href="{{ route('admin.tickets.index') }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Total</p>
+                                    <p class="text-xl font-bold text-gray-900">{{ $stats['total_tickets'] }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <!-- Open Tickets Card -->
+                        <a href="{{ $stats['open_tickets'] > 0 ? route('admin.tickets.index', ['status' => 'open']) : '#' }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Open</p>
+                                    <p class="text-xl font-bold text-gray-900">{{ $stats['open_tickets'] }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <!-- In Progress Tickets Card -->
+                        <a href="{{ route('admin.tickets.index', ['status' => 'in_progress']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">In Progress</p>
+                                    <p class="text-xl font-bold text-gray-900">{{ $stats['in_progress_tickets'] }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <!-- Resolved Tickets Card -->
+                        <a href="{{ route('admin.tickets.index', ['status' => 'resolved']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Resolved</p>
+                                    <p class="text-xl font-bold text-gray-900">{{ $stats['resolved_tickets'] }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </a>
+
+                        <!-- Closed Tickets Card -->
+                        <a href="{{ route('admin.tickets.index', ['status' => 'closed']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Closed</p>
+                                    <p class="text-xl font-bold text-gray-900">{{ $stats['closed_tickets'] }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Quick Actions Section -->
@@ -420,6 +518,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
                             Add University
+                        </a>
+                        <a href="{{ route('admin.tickets.index') }}" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            Support Tickets
                         </a>
                     </div>
                 </div>
