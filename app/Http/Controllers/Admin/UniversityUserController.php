@@ -158,20 +158,15 @@ class UniversityUserController extends Controller
 
     /**
      * Remove the specified university user from storage
+     * 
+     * DISABLED: User deletion is not allowed for security reasons.
      */
     public function destroy(User $universityUser)
     {
-        // Ensure we're deleting a university user
-        if ($universityUser->role !== 'university_user') {
-            abort(404);
-        }
-
-        $userEmail = $universityUser->email;
-        $universityUser->delete();
-
+        // User deletion is disabled for all users
         return redirect()
-            ->route('admin.university-users.index')
-            ->with('success', "University user '{$userEmail}' deleted successfully!");
+            ->back()
+            ->with('error', 'User deletion is disabled. Users cannot be deleted for security and data integrity reasons.');
     }
 
     /**

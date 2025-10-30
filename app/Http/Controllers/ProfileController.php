@@ -80,22 +80,13 @@ class ProfileController extends Controller
 
     /**
      * Delete the user's account.
+     * 
+     * DISABLED: User deletion is not allowed for security reasons.
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        // User deletion is disabled for all users
+        return Redirect::route('profile.edit')
+            ->with('error', 'Account deletion is disabled. Users cannot be deleted for security and data integrity reasons.');
     }
 }
