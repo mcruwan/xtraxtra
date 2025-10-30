@@ -40,6 +40,31 @@
                 </div>
             @endif
 
+            <!-- Info Banner for Rejected Articles -->
+            @if($newsSubmission->status === 'rejected')
+                <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Resubmitting Rejected Article</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>This article was previously rejected. When you save changes, it will be resubmitted for admin review with "pending" status. Please address the feedback provided in the rejection reason.</p>
+                                @if($newsSubmission->rejection_reason)
+                                    <div class="mt-2 p-2 bg-white rounded border border-red-200">
+                                        <p class="text-xs font-medium text-red-900 mb-1">Previous Rejection Reason:</p>
+                                        <p class="text-xs text-red-800">{{ $newsSubmission->rejection_reason }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Form - Flowbite Card -->
             <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
                 <form action="{{ route('university.news.update', $newsSubmission) }}" method="POST" enctype="multipart/form-data" id="news-form">

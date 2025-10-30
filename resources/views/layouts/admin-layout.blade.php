@@ -25,9 +25,14 @@
                 <div class="h-full px-3 py-4 overflow-y-auto bg-gray-800 flex flex-col">
                     <!-- Sidebar Header -->
                     <div class="flex items-center justify-between mb-5 px-3 pt-3 pb-3 border-b border-gray-700 flex-shrink-0">
-                        <a href="{{ route('admin.dashboard') }}" class="flex flex-col">
-                            <span class="text-lg font-bold text-white">AppliedHE Xtra! Xtra!</span>
-                            <span class="text-xs text-gray-400 font-semibold">ADMIN PANEL</span>
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center w-full">
+                            @if(\App\Models\Setting::getLightLogo())
+                                <img src="{{ \App\Models\Setting::getLightLogo() }}" 
+                                     alt="Admin Panel Logo" 
+                                     class="w-full h-auto object-contain">
+                            @else
+                                <span class="text-lg font-bold text-white">AppliedHE Xtra! Xtra!</span>
+                            @endif
                         </a>
                         <!-- Close button for mobile -->
                         <button @click="sidebarOpen = false" class="lg:hidden text-gray-400 hover:bg-gray-700 hover:text-white rounded-lg p-1.5" aria-label="Close sidebar">
@@ -50,26 +55,6 @@
                             </a>
                         </li>
 
-                        <!-- Universities -->
-                        <li>
-                            <a href="{{ route('admin.universities.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.universities.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
-                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.universities.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                </svg>
-                                <span class="ms-3">Universities</span>
-                            </a>
-                        </li>
-
-                        <!-- News Categories -->
-                        <li>
-                            <a href="{{ route('admin.categories.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
-                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.categories.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                </svg>
-                                <span class="ms-3">News Categories</span>
-                            </a>
-                        </li>
-
                         <!-- News Submissions -->
                         <li>
                             <a href="{{ route('admin.news.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.news.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
@@ -83,13 +68,23 @@
                             </a>
                         </li>
 
-                        <!-- FAQs -->
+                        <!-- Universities -->
                         <li>
-                            <a href="{{ route('admin.faqs.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.faqs.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
-                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.faqs.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <a href="{{ route('admin.universities.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.universities.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
+                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.universities.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                 </svg>
-                                <span class="ms-3">FAQs</span>
+                                <span class="ms-3">Universities</span>
+                            </a>
+                        </li>
+
+                        <!-- University Users -->
+                        <li>
+                            <a href="{{ route('admin.university-users.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.university-users.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
+                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.university-users.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 009.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                <span class="ms-3">University Users</span>
                             </a>
                         </li>
 
@@ -105,13 +100,23 @@
                         </li>
                         @endif
 
-                        <!-- University Users -->
+                        <!-- News Categories -->
                         <li>
-                            <a href="{{ route('admin.university-users.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.university-users.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
-                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.university-users.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            <a href="{{ route('admin.categories.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
+                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.categories.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                 </svg>
-                                <span class="ms-3">University Users</span>
+                                <span class="ms-3">News Categories</span>
+                            </a>
+                        </li>
+
+                        <!-- FAQs -->
+                        <li>
+                            <a href="{{ route('admin.faqs.index') }}" class="flex items-center p-2 text-gray-300 rounded-lg {{ request()->routeIs('admin.faqs.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-700 hover:text-white' }} group">
+                                <svg class="w-5 h-5 text-gray-400 transition duration-75 group-hover:text-white {{ request()->routeIs('admin.faqs.*') ? 'text-white' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="ms-3">FAQs</span>
                             </a>
                         </li>
 
@@ -178,7 +183,15 @@
                         <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
                     </svg>
                 </button>
-                <span class="text-white font-bold text-lg">Admin Panel</span>
+                <div class="flex items-center flex-1 justify-center">
+                    @if(\App\Models\Setting::getLightLogo())
+                        <img src="{{ \App\Models\Setting::getLightLogo() }}" 
+                             alt="Admin Panel Logo" 
+                             class="h-8 w-auto object-contain max-w-full">
+                    @else
+                        <span class="text-white font-bold text-lg">Admin Panel</span>
+                    @endif
+                </div>
                 <div class="w-6"></div>
             </div>
 

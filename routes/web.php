@@ -119,9 +119,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Settings management
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
         ->name('settings.index');
-    Route::post('/settings/logo', [App\Http\Controllers\Admin\SettingsController::class, 'updateLogo'])
+    Route::post('/settings/logo/{type}', [App\Http\Controllers\Admin\SettingsController::class, 'updateLogo'])
         ->name('settings.logo.update');
-    Route::delete('/settings/logo', [App\Http\Controllers\Admin\SettingsController::class, 'removeLogo'])
+    Route::delete('/settings/logo/{type}', [App\Http\Controllers\Admin\SettingsController::class, 'removeLogo'])
         ->name('settings.logo.remove');
     Route::put('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])
         ->name('settings.update');
@@ -129,6 +129,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('settings.update-email-api');
     Route::post('/settings/test-brevo-api', [App\Http\Controllers\Admin\SettingsController::class, 'testBrevoApi'])
         ->name('settings.test-brevo-api');
+    
+    // Impersonation
+    Route::post('/impersonate/{university}', [App\Http\Controllers\Admin\ImpersonationController::class, 'impersonate'])
+        ->name('impersonate');
 });
 
 // University routes
@@ -149,6 +153,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/university', [ProfileController::class, 'updateUniversity'])->name('profile.university.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Stop impersonation (accessible when impersonating)
+    Route::post('/stop-impersonating', [App\Http\Controllers\Admin\ImpersonationController::class, 'stopImpersonating'])
+        ->name('stop-impersonating');
 });
 
 require __DIR__.'/auth.php';

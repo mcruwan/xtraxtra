@@ -88,85 +88,173 @@
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
                         <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
                             <h2 class="text-lg font-semibold text-gray-900">Platform Logo</h2>
-                            <p class="mt-1 text-sm text-gray-600">Upload your platform logo to be displayed in the header</p>
+                            <p class="mt-1 text-sm text-gray-600">Upload your platform logos to be displayed in the header. Use dark logo for light backgrounds and light logo for dark backgrounds.</p>
                         </div>
-                        <div class="p-6">
-                            <!-- Current Logo Display -->
-                            @php
-                                $currentLogo = $settings['platform_logo'] ?? null;
-                            @endphp
+                        <div class="p-6 space-y-8">
+                            <!-- Dark Logo Section (for light backgrounds) -->
+                            <div>
+                                <h3 class="text-md font-semibold text-gray-900 mb-4">Dark Logo (for light backgrounds)</h3>
+                                
+                                @php
+                                    $currentDarkLogo = $settings['platform_logo_dark'] ?? null;
+                                @endphp
 
-                            @if($currentLogo && $currentLogo->value)
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-900 mb-3">Current Logo</label>
-                                    <div class="flex items-start space-x-4">
-                                        <div class="flex-shrink-0 bg-gray-100 rounded-lg p-4 border border-gray-200">
-                                            <img src="{{ Storage::url($currentLogo->value) }}" alt="Platform Logo" class="h-24 w-auto object-contain">
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="flex items-center space-x-3">
-                                                <form action="{{ route('admin.settings.logo.remove') }}" method="POST" onsubmit="return confirm('Are you sure you want to remove the current logo?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
-                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                        </svg>
-                                                        Remove Logo
-                                                    </button>
-                                                </form>
+                                @if($currentDarkLogo && $currentDarkLogo->value)
+                                    <div class="mb-6">
+                                        <label class="block text-sm font-medium text-gray-900 mb-3">Current Dark Logo</label>
+                                        <div class="flex items-start space-x-4">
+                                            <div class="flex-shrink-0 bg-gray-100 rounded-lg p-4 border border-gray-200">
+                                                <img src="{{ Storage::url($currentDarkLogo->value) }}" alt="Dark Platform Logo" class="h-24 w-auto object-contain">
                                             </div>
-                                            <p class="text-xs text-gray-500 mt-2">Upload a new logo to replace the current one</p>
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-3">
+                                                    <form action="{{ route('admin.settings.logo.remove', ['type' => 'dark']) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove the dark logo?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
+                                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                            Remove Dark Logo
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <p class="text-xs text-gray-500 mt-2">Upload a new dark logo to replace the current one</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            @else
-                                <div class="mb-6">
-                                    <div class="flex items-center justify-center w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
-                                        <div class="text-center">
-                                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                            <p class="mt-2 text-sm text-gray-600 font-medium">No logo uploaded yet</p>
-                                            <p class="text-xs text-gray-500">Upload your platform logo below</p>
+                                @else
+                                    <div class="mb-6">
+                                        <div class="flex items-center justify-center w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                                            <div class="text-center">
+                                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <p class="mt-2 text-sm text-gray-600 font-medium">No dark logo uploaded yet</p>
+                                                <p class="text-xs text-gray-500">Upload your dark platform logo below</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endif
+                                @endif
 
-                            <!-- Upload Form -->
-                            <form action="{{ route('admin.settings.logo.update') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="platform_logo" class="block text-sm font-medium text-gray-900 mb-2">
-                                            {{ ($currentLogo && $currentLogo->value) ? 'Upload New Logo' : 'Upload Logo' }}
-                                            @if($errors->has('platform_logo'))
-                                                <span class="text-red-600 font-normal">*</span>
-                                            @endif
-                                        </label>
-                                        <input 
-                                            type="file" 
-                                            id="platform_logo" 
-                                            name="platform_logo" 
-                                            accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml"
-                                            class="block w-full text-sm text-gray-900 border {{ $errors->has('platform_logo') ? 'border-red-500' : 'border-gray-300' }} rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2.5 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                                        @error('platform_logo')
-                                            <x-input-error :messages="$errors->get('platform_logo')" class="mt-2" />
-                                        @enderror
-                                        <p class="mt-2 text-xs text-gray-500">Supported formats: JPG, JPEG, PNG, GIF, SVG. Maximum size: 2MB</p>
-                                    </div>
+                                <!-- Dark Logo Upload Form -->
+                                <form action="{{ route('admin.settings.logo.update', ['type' => 'dark']) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="platform_logo_dark" class="block text-sm font-medium text-gray-900 mb-2">
+                                                {{ ($currentDarkLogo && $currentDarkLogo->value) ? 'Upload New Dark Logo' : 'Upload Dark Logo' }}
+                                                @if($errors->has('platform_logo_dark'))
+                                                    <span class="text-red-600 font-normal">*</span>
+                                                @endif
+                                            </label>
+                                            <input 
+                                                type="file" 
+                                                id="platform_logo_dark" 
+                                                name="platform_logo_dark" 
+                                                accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml"
+                                                class="block w-full text-sm text-gray-900 border {{ $errors->has('platform_logo_dark') ? 'border-red-500' : 'border-gray-300' }} rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2.5 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                            @error('platform_logo_dark')
+                                                <x-input-error :messages="$errors->get('platform_logo_dark')" class="mt-2" />
+                                            @enderror
+                                            <p class="mt-2 text-xs text-gray-500">Supported formats: JPG, JPEG, PNG, GIF, SVG. Maximum size: 2MB</p>
+                                        </div>
 
-                                    <div class="flex items-center space-x-3">
-                                        <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                                            </svg>
-                                            Upload Logo
-                                        </button>
+                                        <div class="flex items-center space-x-3">
+                                            <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                </svg>
+                                                Upload Dark Logo
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200"></div>
+
+                            <!-- Light Logo Section (for dark backgrounds) -->
+                            <div>
+                                <h3 class="text-md font-semibold text-gray-900 mb-4">Light Logo (for dark backgrounds)</h3>
+                                
+                                @php
+                                    $currentLightLogo = $settings['platform_logo_light'] ?? null;
+                                @endphp
+
+                                @if($currentLightLogo && $currentLightLogo->value)
+                                    <div class="mb-6">
+                                        <label class="block text-sm font-medium text-gray-900 mb-3">Current Light Logo</label>
+                                        <div class="flex items-start space-x-4">
+                                            <div class="flex-shrink-0 bg-gray-900 rounded-lg p-4 border border-gray-700">
+                                                <img src="{{ Storage::url($currentLightLogo->value) }}" alt="Light Platform Logo" class="h-24 w-auto object-contain">
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-3">
+                                                    <form action="{{ route('admin.settings.logo.remove', ['type' => 'light']) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove the light logo?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-300 transition-colors">
+                                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                            </svg>
+                                                            Remove Light Logo
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <p class="text-xs text-gray-500 mt-2">Upload a new light logo to replace the current one</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="mb-6">
+                                        <div class="flex items-center justify-center w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                                            <div class="text-center">
+                                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <p class="mt-2 text-sm text-gray-600 font-medium">No light logo uploaded yet</p>
+                                                <p class="text-xs text-gray-500">Upload your light platform logo below</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Light Logo Upload Form -->
+                                <form action="{{ route('admin.settings.logo.update', ['type' => 'light']) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="platform_logo_light" class="block text-sm font-medium text-gray-900 mb-2">
+                                                {{ ($currentLightLogo && $currentLightLogo->value) ? 'Upload New Light Logo' : 'Upload Light Logo' }}
+                                                @if($errors->has('platform_logo_light'))
+                                                    <span class="text-red-600 font-normal">*</span>
+                                                @endif
+                                            </label>
+                                            <input 
+                                                type="file" 
+                                                id="platform_logo_light" 
+                                                name="platform_logo_light" 
+                                                accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml"
+                                                class="block w-full text-sm text-gray-900 border {{ $errors->has('platform_logo_light') ? 'border-red-500' : 'border-gray-300' }} rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2.5 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                            @error('platform_logo_light')
+                                                <x-input-error :messages="$errors->get('platform_logo_light')" class="mt-2" />
+                                            @enderror
+                                            <p class="mt-2 text-xs text-gray-500">Supported formats: JPG, JPEG, PNG, GIF, SVG. Maximum size: 2MB</p>
+                                        </div>
+
+                                        <div class="flex items-center space-x-3">
+                                            <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                </svg>
+                                                Upload Light Logo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
 

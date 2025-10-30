@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsSubmission;
 use App\Models\University;
+use App\Notifications\NewsSubmissionRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
@@ -301,13 +302,18 @@ class NewsSubmissionController extends Controller
         $newsSubmission->update([
             'status' => 'rejected',
             'rejection_reason' => $request->rejection_reason,
+            'rejected_by' => auth()->id(),
+            'rejected_at' => now(),
             'approved_by' => null,
             'approved_at' => null,
         ]);
 
+        // Send notification to the university user who submitted the article
+        $newsSubmission->user->notify(new NewsSubmissionRejected($newsSubmission));
+
         return redirect()
             ->back()
-            ->with('success', 'News submission has been rejected.');
+            ->with('success', 'News submission has been rejected and the university has been notified.');
     }
 
     /**

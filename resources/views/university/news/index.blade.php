@@ -351,7 +351,31 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <x-status-badge :status="$submission->status" />
+                                            <div class="flex items-center gap-2">
+                                                <x-status-badge :status="$submission->status" />
+                                                @if($submission->status === 'rejected' && $submission->rejection_reason)
+                                                    <div class="relative group">
+                                                        <button type="button" 
+                                                                class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                                                                title="View rejection reason">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                            </svg>
+                                                        </button>
+                                                        <!-- Tooltip -->
+                                                        <div class="absolute z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-80">
+                                                            <div class="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-lg">
+                                                                <div class="font-medium mb-1">Rejection Reason:</div>
+                                                                <div class="text-gray-200">{{ Str::limit($submission->rejection_reason, 200) }}</div>
+                                                                @if(strlen($submission->rejection_reason) > 200)
+                                                                    <div class="text-gray-400 mt-1 text-xs">Click to view full reason</div>
+                                                                @endif
+                                                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $submission->created_at->format('M d, Y') }}
@@ -377,7 +401,15 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     </svg>
                                                 </a>
-                                                @if($submission->status !== 'rejected')
+                                                @if($submission->status === 'rejected')
+                                                    <a href="{{ route('university.news.edit', $submission) }}" 
+                                                       class="p-1.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors" 
+                                                       title="Edit and Resubmit">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                        </svg>
+                                                    </a>
+                                                @elseif($submission->status !== 'rejected')
                                                     <a href="{{ route('university.news.edit', $submission) }}" 
                                                        class="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors" 
                                                        title="{{ in_array($submission->status, ['approved', 'published']) ? 'Edit (will resubmit for approval)' : 'Edit' }}">

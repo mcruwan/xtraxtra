@@ -76,11 +76,23 @@
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                                     </svg>
                                     <div class="flex-1">
-                                        <p class="text-sm font-medium text-red-800">This submission has been rejected</p>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-sm font-medium text-red-800">This submission has been rejected</p>
+                                            @if($newsSubmission->rejected_at)
+                                                <p class="text-xs text-red-600">
+                                                    Rejected on {{ $newsSubmission->rejected_at->format('M d, Y \a\t h:i A') }}
+                                                    @if($newsSubmission->rejector)
+                                                        by {{ $newsSubmission->rejector->name }}
+                                                    @endif
+                                                </p>
+                                            @endif
+                                        </div>
                                         @if($newsSubmission->rejection_reason)
-                                            <p class="text-sm text-red-700 mt-2">
-                                                <span class="font-medium">Reason:</span> {{ $newsSubmission->rejection_reason }}
-                                            </p>
+                                            <div class="mt-2 p-3 bg-white rounded border border-red-200">
+                                                <p class="text-sm text-red-700">
+                                                    <span class="font-medium">Reason:</span> {{ $newsSubmission->rejection_reason }}
+                                                </p>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -327,8 +339,8 @@
     <div id="rejectModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-50">
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                    <form action="{{ route('admin.news.reject', $newsSubmission) }}" method="POST">
+                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                    <form action="{{ route('admin.news.reject', $newsSubmission) }}" method="POST" id="rejectForm">
                         @csrf
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <div class="sm:flex sm:items-start">
@@ -338,34 +350,88 @@
                                     </svg>
                                 </div>
                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
-                                    <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
-                                        Reject Submission
+                                    <h3 class="text-lg font-medium leading-6 text-gray-900 mb-2">
+                                        Reject News Submission
                                     </h3>
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        You are about to reject this news submission. Please provide a clear reason for the rejection.
+                                    </p>
+                                    
+                                    <!-- Article Info -->
+                                    <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                                        <h4 class="text-sm font-medium text-gray-900 mb-1">{{ $newsSubmission->title }}</h4>
+                                        <p class="text-xs text-gray-600">Submitted by {{ $newsSubmission->university->name }}</p>
+                                    </div>
+
                                     <div>
                                         <label for="rejection_reason" class="block text-sm font-medium text-gray-700 mb-2">
                                             Rejection Reason <span class="text-red-500">*</span>
                                         </label>
                                         <textarea name="rejection_reason" 
                                                   id="rejection_reason" 
-                                                  rows="4"
+                                                  rows="5"
                                                   required
-                                                  class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
-                                                  placeholder="Please provide a detailed reason for rejecting this submission..."></textarea>
-                                        <p class="mt-2 text-sm text-gray-500">
-                                            This reason will be visible to the university user who submitted the article.
-                                        </p>
+                                                  minlength="10"
+                                                  maxlength="1000"
+                                                  class="w-full rounded-lg border-gray-300 shadow-sm bg-white text-gray-900 placeholder-gray-400 focus:border-red-500 focus:ring-red-500 @error('rejection_reason') border-red-500 @enderror"
+                                                  placeholder="Please provide a detailed reason for rejecting this submission. Be specific about what needs to be improved..."></textarea>
+                                        
+                                        <!-- Character counter -->
+                                        <div class="flex justify-between items-center mt-1">
+                                            <p class="text-xs text-gray-500">
+                                                This reason will be visible to the university user who submitted the article.
+                                            </p>
+                                            <span id="charCount" class="text-xs text-gray-400">0/1000</span>
+                                        </div>
+                                        
+                                        @error('rejection_reason')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Common rejection reasons -->
+                                    <div class="mt-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Common Reasons (click to use)
+                                        </label>
+                                        <div class="grid grid-cols-1 gap-2">
+                                            <button type="button" 
+                                                    onclick="setRejectionReason('Content does not meet our editorial standards. Please review our guidelines and resubmit with improved content.')"
+                                                    class="text-left text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-2 rounded border border-gray-200 hover:border-gray-300 transition-colors">
+                                                Content quality issues
+                                            </button>
+                                            <button type="button" 
+                                                    onclick="setRejectionReason('The article contains factual inaccuracies or unverified claims. Please fact-check and provide reliable sources.')"
+                                                    class="text-left text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-2 rounded border border-gray-200 hover:border-gray-300 transition-colors">
+                                                Factual inaccuracies
+                                            </button>
+                                            <button type="button" 
+                                                    onclick="setRejectionReason('The content is not relevant to our target audience or publication guidelines. Please ensure the content aligns with our editorial focus.')"
+                                                    class="text-left text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-2 rounded border border-gray-200 hover:border-gray-300 transition-colors">
+                                                Not relevant to audience
+                                            </button>
+                                            <button type="button" 
+                                                    onclick="setRejectionReason('The article needs better structure and formatting. Please improve the organization and readability before resubmitting.')"
+                                                    class="text-left text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-2 rounded border border-gray-200 hover:border-gray-300 transition-colors">
+                                                Poor structure/formatting
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                             <button type="submit" 
-                                    class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto">
+                                    id="rejectSubmitBtn"
+                                    class="inline-flex w-full justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
                                 Reject Submission
                             </button>
                             <button type="button"
-                                    onclick="document.getElementById('rejectModal').classList.add('hidden')"
-                                    class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                    onclick="closeRejectModal()"
+                                    class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 sm:mt-0 sm:w-auto">
                                 Cancel
                             </button>
                         </div>
@@ -409,6 +475,71 @@
                 return confirm('Are you sure you want to approve this news submission?');
             }
         }
+
+        // Rejection modal functions
+        function setRejectionReason(reason) {
+            const textarea = document.getElementById('rejection_reason');
+            textarea.value = reason;
+            updateCharCount();
+            textarea.focus();
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('rejection_reason');
+            const charCount = document.getElementById('charCount');
+            const currentLength = textarea.value.length;
+            const maxLength = 1000;
+            
+            charCount.textContent = `${currentLength}/${maxLength}`;
+            
+            if (currentLength > maxLength * 0.9) {
+                charCount.className = 'text-xs text-orange-500';
+            } else if (currentLength > maxLength) {
+                charCount.className = 'text-xs text-red-500';
+            } else {
+                charCount.className = 'text-xs text-gray-400';
+            }
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            document.getElementById('rejection_reason').value = '';
+            updateCharCount();
+        }
+
+        function validateRejectionForm() {
+            const textarea = document.getElementById('rejection_reason');
+            const submitBtn = document.getElementById('rejectSubmitBtn');
+            
+            if (textarea.value.trim().length < 10) {
+                alert('Please provide a more detailed rejection reason (at least 10 characters).');
+                textarea.focus();
+                return false;
+            }
+            
+            if (textarea.value.trim().length > 1000) {
+                alert('Rejection reason is too long. Please keep it under 1000 characters.');
+                textarea.focus();
+                return false;
+            }
+            
+            return confirm('Are you sure you want to reject this submission? This action cannot be undone.');
+        }
+
+        // Initialize character counter
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('rejection_reason');
+            if (textarea) {
+                textarea.addEventListener('input', updateCharCount);
+                
+                // Form validation
+                document.getElementById('rejectForm').addEventListener('submit', function(e) {
+                    if (!validateRejectionForm()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
     </script>
 </x-admin-layout>
 
