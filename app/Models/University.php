@@ -29,6 +29,17 @@ class University extends Model
     }
 
     /**
+     * Get the primary admin user for the university (first user created).
+     */
+    public function getAdminUserAttribute()
+    {
+        return $this->users()
+            ->where('role', 'university_user')
+            ->orderBy('id')
+            ->first();
+    }
+
+    /**
      * Get the news submissions for the university.
      */
     public function newsSubmissions(): HasMany
