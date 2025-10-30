@@ -56,11 +56,30 @@ class Setting extends Model
     }
 
     /**
-     * Get the logo URL
+     * Get the logo URL (for backward compatibility - returns dark logo)
+     * 
+     * @deprecated Use getDarkLogo() or getLightLogo() instead
      */
     public static function getLogo(): ?string
     {
-        $logoPath = static::get('platform_logo');
+        return static::getDarkLogo();
+    }
+
+    /**
+     * Get the dark logo URL (for light backgrounds)
+     */
+    public static function getDarkLogo(): ?string
+    {
+        $logoPath = static::get('platform_logo_dark');
+        return $logoPath ? Storage::url($logoPath) : null;
+    }
+
+    /**
+     * Get the light logo URL (for dark backgrounds)
+     */
+    public static function getLightLogo(): ?string
+    {
+        $logoPath = static::get('platform_logo_light');
         return $logoPath ? Storage::url($logoPath) : null;
     }
 

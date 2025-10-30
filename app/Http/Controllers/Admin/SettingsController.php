@@ -32,7 +32,7 @@ class SettingsController extends Controller
     /**
      * Update platform logo
      */
-    public function updateLogo(Request $request)
+    public function updateLogo(Request $request, $type = 'dark')
     {
         // Check if settings table exists
         if (!Schema::hasTable('settings')) {
@@ -41,24 +41,38 @@ class SettingsController extends Controller
                 ->with('error', 'Settings table does not exist. Please run the migration first.');
         }
 
+        // Validate logo type
+        if (!in_array($type, ['dark', 'light'])) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Invalid logo type. Must be "dark" or "light".');
+        }
+
+        $fieldName = $type === 'dark' ? 'platform_logo_dark' : 'platform_logo_light';
+        $logoLabel = $type === 'dark' ? 'dark logo' : 'light logo';
+
         $validated = $request->validate([
-            'platform_logo' => 'required|image|mimes:jpeg,jpg,png,gif,svg|max:2048',
+            $fieldName => 'required|image|mimes:jpeg,jpg,png,gif,svg|max:2048',
         ], [
-            'platform_logo.required' => 'Please select a logo file to upload.',
-            'platform_logo.image' => 'The uploaded file must be an image.',
-            'platform_logo.mimes' => 'The logo must be a file of type: jpeg, jpg, png, gif, svg.',
-            'platform_logo.max' => 'The logo may not be greater than 2MB in size.',
+            $fieldName . '.required' => 'Please select a logo file to upload.',
+            $fieldName . '.image' => 'The uploaded file must be an image.',
+            $fieldName . '.mimes' => 'The logo must be a file of type: jpeg, jpg, png, gif, svg.',
+            $fieldName . '.max' => 'The logo may not be greater than 2MB in size.',
         ]);
 
         try {
             // Get old logo path to delete it later
-            $oldLogoPath = Setting::get('platform_logo');
+            $settingKey = $type === 'dark' ? 'platform_logo_dark' : 'platform_logo_light';
+            $oldLogoPath = Setting::get($settingKey);
 
             // Store the new logo
-            $path = $request->file('platform_logo')->store('logos', 'public');
+            $path = $request->file($fieldName)->store('logos', 'public');
 
             // Update the setting
-            Setting::set('platform_logo', $path, 'image', 'Platform logo displayed in the header');
+            $description = $type === 'dark' 
+                ? 'Platform dark logo displayed in the header (for light backgrounds)' 
+                : 'Platform light logo displayed in the header (for dark backgrounds)';
+            Setting::set($settingKey, $path, 'image', $description);
 
             // Delete old logo if exists
             if ($oldLogoPath) {
@@ -67,7 +81,7 @@ class SettingsController extends Controller
 
             return redirect()
                 ->route('admin.settings.index')
-                ->with('success', 'Platform logo updated successfully!');
+                ->with('success', 'Platform ' . $logoLabel . ' updated successfully!');
         } catch (\Exception $e) {
             return redirect()
                 ->back()
@@ -79,7 +93,7 @@ class SettingsController extends Controller
     /**
      * Remove platform logo
      */
-    public function removeLogo()
+    public function removeLogo($type = 'dark')
     {
         // Check if settings table exists
         if (!Schema::hasTable('settings')) {
@@ -88,24 +102,33 @@ class SettingsController extends Controller
                 ->with('error', 'Settings table does not exist. Please run the migration first.');
         }
 
+        // Validate logo type
+        if (!in_array($type, ['dark', 'light'])) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Invalid logo type. Must be "dark" or "light".');
+        }
+
         try {
-            $logoPath = Setting::get('platform_logo');
+            $settingKey = $type === 'dark' ? 'platform_logo_dark' : 'platform_logo_light';
+            $logoLabel = $type === 'dark' ? 'dark logo' : 'light logo';
+            $logoPath = Setting::get($settingKey);
 
             if ($logoPath) {
                 // Delete the file
                 Setting::deleteOldLogo($logoPath);
 
                 // Remove the setting
-                Setting::where('key', 'platform_logo')->delete();
+                Setting::where('key', $settingKey)->delete();
 
                 return redirect()
                     ->route('admin.settings.index')
-                    ->with('success', 'Platform logo removed successfully!');
+                    ->with('success', 'Platform ' . $logoLabel . ' removed successfully!');
             }
 
             return redirect()
                 ->back()
-                ->with('info', 'No logo to remove.');
+                ->with('info', 'No ' . $logoLabel . ' to remove.');
         } catch (\Exception $e) {
             return redirect()
                 ->back()

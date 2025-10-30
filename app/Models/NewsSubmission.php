@@ -13,6 +13,7 @@ class NewsSubmission extends Model
         'university_id',
         'user_id',
         'approved_by',
+        'rejected_by',
         'title',
         'slug',
         'excerpt',
@@ -22,6 +23,7 @@ class NewsSubmission extends Model
         'rejection_reason',
         'submitted_at',
         'approved_at',
+        'rejected_at',
         'scheduled_at',
         'published_at',
         'live_url',
@@ -34,6 +36,7 @@ class NewsSubmission extends Model
     protected $casts = [
         'submitted_at' => 'datetime',
         'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
         'scheduled_at' => 'datetime',
         'published_at' => 'datetime',
         'last_edited_at' => 'datetime',
@@ -125,6 +128,14 @@ class NewsSubmission extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the user who rejected the news submission
+     */
+    public function rejector(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
     }
 
     /**

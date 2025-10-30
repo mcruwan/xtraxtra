@@ -42,6 +42,18 @@ $statusConfig = [
         'ring' => 'ring-purple-600/20',
         'label' => 'Scheduled',
     ],
+    'rejected' => [
+        'bg' => 'bg-red-100',
+        'text' => 'text-red-800',
+        'ring' => 'ring-red-600/20',
+        'label' => 'Rejected',
+    ],
+    'draft' => [
+        'bg' => 'bg-gray-100',
+        'text' => 'text-gray-800',
+        'ring' => 'ring-gray-600/20',
+        'label' => 'Draft',
+    ],
 ];
 
 $sizeClasses = [

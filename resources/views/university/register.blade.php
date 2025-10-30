@@ -6,13 +6,25 @@
     <title>Register University - {{ config('app.name', 'AppliedHE') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body style="background: linear-gradient(135deg, #001da1 0%, #00096a 100%);">
+<body style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
     <div class="flex min-h-screen items-center justify-center px-4 py-12">
         <div class="w-full max-w-4xl">
             <!-- Header -->
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-white mb-2 drop-shadow-lg">Register Your University</h1>
-                <p class="text-white/90">Submit your university for approval to start publishing news</p>
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <!-- Left Column - Logo -->
+                <div class="flex items-center justify-center">
+                    @if(\App\Models\Setting::getLightLogo())
+                        <img src="{{ \App\Models\Setting::getLightLogo() }}" 
+                             alt="AppliedHE Xtra! Xtra! Logo" 
+                             class="h-20 w-auto object-contain">
+                    @endif
+                </div>
+                <!-- Right Column - Text -->
+                <div class="flex items-center">
+                    <div class="text-center">
+                        <h1 class="text-3xl font-bold text-white mb-2 drop-shadow-lg">Register Your University</h1>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-white rounded-lg shadow-xl p-8 backdrop-blur-sm">

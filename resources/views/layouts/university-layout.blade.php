@@ -20,6 +20,9 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
+            <!-- Impersonation Banner -->
+            <x-impersonation-banner />
+            
             <!-- University Navigation - Standard Flowbite Navbar -->
             <nav class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-900 border-b border-brand-700">
                 <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">

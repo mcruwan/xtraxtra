@@ -188,11 +188,8 @@ class NewsSubmissionController extends Controller
         // Ensure user can only edit their university's submissions
         $this->authorize('update', $newsSubmission);
 
-        // Only prevent editing rejected submissions
-        if ($newsSubmission->status === 'rejected') {
-            return redirect()->route('university.news.show', $newsSubmission)
-                ->with('error', 'You cannot edit a rejected submission. Please create a new submission instead.');
-        }
+        // Load necessary relationships
+        $newsSubmission->load(['rejector']);
 
         $categories = Category::orderBy('name')->get();
         $tags = Tag::orderBy('name')->get();
@@ -207,12 +204,6 @@ class NewsSubmissionController extends Controller
     {
         // Ensure user can only update their university's submissions
         $this->authorize('update', $newsSubmission);
-
-        // Can't edit if rejected
-        if ($newsSubmission->status === 'rejected') {
-            return redirect()->route('university.news.show', $newsSubmission)
-                ->with('error', 'You cannot edit a rejected submission. Please create a new submission instead.');
-        }
 
         $data = $request->validated();
 
@@ -242,6 +233,7 @@ class NewsSubmissionController extends Controller
 
         // Track if this is editing an approved/published article
         $wasApprovedOrPublished = in_array($newsSubmission->status, ['approved', 'published']);
+        $wasRejected = $newsSubmission->status === 'rejected';
         
         // If editing an approved or published article, mark as revision and return to pending
         if ($wasApprovedOrPublished) {
@@ -251,6 +243,23 @@ class NewsSubmissionController extends Controller
             $data['last_edited_at'] = now();
             $data['submitted_at'] = now();
             // Clear approval data since it needs re-approval
+            $data['approved_by'] = null;
+            $data['approved_at'] = null;
+            // Clear scheduled_at and live_url when resubmitting
+            $data['scheduled_at'] = null;
+            $data['live_url'] = null;
+        } elseif ($wasRejected) {
+            // If editing a rejected article, mark as resubmission and return to pending
+            $data['is_revision'] = true;
+            $data['previous_status'] = $newsSubmission->status;
+            $data['status'] = 'pending';
+            $data['last_edited_at'] = now();
+            $data['submitted_at'] = now();
+            // Clear rejection data since it's being resubmitted
+            $data['rejected_by'] = null;
+            $data['rejected_at'] = null;
+            $data['rejection_reason'] = null;
+            // Clear approval data
             $data['approved_by'] = null;
             $data['approved_at'] = null;
             // Clear scheduled_at and live_url when resubmitting
@@ -309,6 +318,8 @@ class NewsSubmissionController extends Controller
         // Set appropriate success message
         if ($wasApprovedOrPublished) {
             $message = 'Your changes have been saved and the article has been resubmitted for approval.';
+        } elseif ($wasRejected) {
+            $message = 'Your changes have been saved and the article has been resubmitted for review. Thank you for addressing the feedback!';
         } elseif (isset($data['status']) && $data['status'] === 'pending') {
             $message = 'News submission submitted for approval successfully!';
         } else {

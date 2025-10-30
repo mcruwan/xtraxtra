@@ -48,11 +48,9 @@ class NewsSubmissionPolicy
         }
 
         // University users can edit their own university's submissions
-        // Can edit: draft, pending, approved, published
-        // Cannot edit: rejected (must create new submission instead)
+        // Can edit: draft, pending, approved, published, rejected (for resubmission)
         return $user->isUniversityUser() 
-            && $user->university_id === $newsSubmission->university_id
-            && $newsSubmission->status !== 'rejected';
+            && $user->university_id === $newsSubmission->university_id;
     }
 
     /**

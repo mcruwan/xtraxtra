@@ -31,19 +31,75 @@
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Status Banner - Flowbite Alerts -->
                     @if($newsSubmission->status === 'rejected')
-                        <div class="flex p-4 mb-6 text-red-800 rounded-lg bg-red-50 border border-red-200" role="alert">
-                            <svg class="flex-shrink-0 w-5 h-5 text-red-600 mt-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="flex p-6 mb-6 text-red-800 rounded-lg bg-red-50 border border-red-200 shadow-sm" role="alert">
+                            <svg class="flex-shrink-0 w-6 h-6 text-red-600 mt-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                             </svg>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">This submission was rejected</h3>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-lg font-semibold text-red-800">Submission Rejected</h3>
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Rejected
+                                        </span>
+                                    </div>
+                                </div>
+                                
                                 @if($newsSubmission->rejection_reason)
-                                    <div class="mt-2 text-sm text-red-700">
-                                        <strong>Reason:</strong> {{ $newsSubmission->rejection_reason }}
+                                    <div class="bg-white rounded-lg p-4 border border-red-200 mb-4">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h4 class="text-sm font-semibold text-red-900 flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                Rejection Reason
+                                            </h4>
+                                            @if($newsSubmission->rejected_at)
+                                                <div class="text-xs text-red-600">
+                                                    Rejected on {{ $newsSubmission->rejected_at->format('M d, Y \a\t h:i A') }}
+                                                    @if($newsSubmission->rejector)
+                                                        by {{ $newsSubmission->rejector->name }}
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="text-sm text-red-800 leading-relaxed whitespace-pre-line">
+                                            {{ $newsSubmission->rejection_reason }}
+                                        </div>
                                     </div>
                                 @endif
-                                <div class="mt-2 text-sm text-red-700">
-                                    You can edit and resubmit this submission for review.
+
+                                <div class="bg-red-100 rounded-lg p-4 border border-red-200">
+                                    <div class="flex items-start">
+                                        <svg class="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <h4 class="text-sm font-semibold text-red-900 mb-1">What's Next?</h4>
+                                            <p class="text-sm text-red-800 mb-3">
+                                                Please review the feedback above and make the necessary improvements to your article.
+                                            </p>
+                                            <div class="flex flex-wrap gap-2">
+                                                <a href="{{ route('university.news.edit', $newsSubmission) }}" 
+                                                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                    Edit & Resubmit
+                                                </a>
+                                                <a href="{{ route('university.news.create') }}" 
+                                                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                    </svg>
+                                                    Create New Article
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
