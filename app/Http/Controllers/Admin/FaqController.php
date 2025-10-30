@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Faq;
 use App\Models\University;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class FaqController extends Controller
 {
@@ -14,6 +15,17 @@ class FaqController extends Controller
      */
     public function index(Request $request)
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            // Return empty paginated collection if table doesn't exist
+            $faqs = \Illuminate\Pagination\LengthAwarePaginator::make([], 0, 15)
+                ->withQueryString();
+            $universities = University::orderBy('name')->get(['id', 'name']);
+            $sortBy = $request->get('sort_by', 'order');
+            $sortDirection = $request->get('sort_direction', 'asc');
+            return view('admin.faqs.index', compact('faqs', 'universities', 'sortBy', 'sortDirection'));
+        }
+
         $query = Faq::with('university');
 
         // Search by question or answer
@@ -62,6 +74,13 @@ class FaqController extends Controller
      */
     public function create()
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            return redirect()
+                ->route('admin.faqs.index')
+                ->with('error', 'FAQs table does not exist. Please run the migration first.');
+        }
+
         $universities = University::where('status', 'active')->orderBy('name')->get(['id', 'name']);
         return view('admin.faqs.create', compact('universities'));
     }
@@ -71,6 +90,13 @@ class FaqController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            return redirect()
+                ->route('admin.faqs.index')
+                ->with('error', 'FAQs table does not exist. Please run the migration first.');
+        }
+
         $validated = $request->validate([
             'university_id' => ['required', 'exists:universities,id'],
             'question' => ['required', 'string', 'max:500'],
@@ -94,6 +120,13 @@ class FaqController extends Controller
      */
     public function show(Faq $faq)
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            return redirect()
+                ->route('admin.faqs.index')
+                ->with('error', 'FAQs table does not exist. Please run the migration first.');
+        }
+
         $faq->load('university');
         return view('admin.faqs.show', compact('faq'));
     }
@@ -103,6 +136,13 @@ class FaqController extends Controller
      */
     public function edit(Faq $faq)
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            return redirect()
+                ->route('admin.faqs.index')
+                ->with('error', 'FAQs table does not exist. Please run the migration first.');
+        }
+
         $faq->load('university');
         $universities = University::where('status', 'active')->orderBy('name')->get(['id', 'name']);
         return view('admin.faqs.edit', compact('faq', 'universities'));
@@ -113,6 +153,13 @@ class FaqController extends Controller
      */
     public function update(Request $request, Faq $faq)
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            return redirect()
+                ->route('admin.faqs.index')
+                ->with('error', 'FAQs table does not exist. Please run the migration first.');
+        }
+
         $validated = $request->validate([
             'university_id' => ['required', 'exists:universities,id'],
             'question' => ['required', 'string', 'max:500'],
@@ -136,6 +183,13 @@ class FaqController extends Controller
      */
     public function destroy(Faq $faq)
     {
+        // Check if faqs table exists
+        if (!Schema::hasTable('faqs')) {
+            return redirect()
+                ->route('admin.faqs.index')
+                ->with('error', 'FAQs table does not exist. Please run the migration first.');
+        }
+
         $faq->delete();
 
         return redirect()
