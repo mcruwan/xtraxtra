@@ -7,6 +7,7 @@ use App\Models\NewsSubmission;
 use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 
 class NewsSubmissionController extends Controller
 {
@@ -22,8 +23,11 @@ class NewsSubmissionController extends Controller
         if ($request->filled('status')) {
             // Special handling for "scheduled_today" filter
             if ($request->status === 'scheduled_today') {
-                $query->where('status', 'scheduled')
-                      ->whereDate('scheduled_at', today());
+                $query->where('status', 'scheduled');
+                // Only filter by scheduled_at if the column exists
+                if (Schema::hasColumn('news_submissions', 'scheduled_at')) {
+                    $query->whereDate('scheduled_at', today());
+                }
             } else {
                 $query->where('status', $request->status);
             }
@@ -66,7 +70,9 @@ class NewsSubmissionController extends Controller
             'pending' => NewsSubmission::pending()->count(),
             'approved' => NewsSubmission::approved()->count(),
             'scheduled' => NewsSubmission::scheduled()->count(),
-            'scheduled_today' => NewsSubmission::scheduled()->whereDate('scheduled_at', today())->count(),
+            'scheduled_today' => Schema::hasColumn('news_submissions', 'scheduled_at') 
+                ? NewsSubmission::scheduled()->whereDate('scheduled_at', today())->count()
+                : 0,
             'rejected' => NewsSubmission::rejected()->count(),
             'published' => NewsSubmission::published()->count(),
         ];
