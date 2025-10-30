@@ -18,8 +18,16 @@ class FaqController extends Controller
         // Check if faqs table exists
         if (!Schema::hasTable('faqs')) {
             // Return empty paginated collection if table doesn't exist
-            $faqs = \Illuminate\Pagination\LengthAwarePaginator::make([], 0, 15)
-                ->withQueryString();
+            $faqs = new \Illuminate\Pagination\LengthAwarePaginator(
+                [],
+                0,
+                15,
+                $request->get('page', 1),
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ]
+            );
             $universities = University::orderBy('name')->get(['id', 'name']);
             $sortBy = $request->get('sort_by', 'order');
             $sortDirection = $request->get('sort_direction', 'asc');
