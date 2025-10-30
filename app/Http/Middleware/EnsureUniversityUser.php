@@ -23,6 +23,11 @@ class EnsureUniversityUser
             abort(403, 'Your account is not active. Please contact administrator.');
         }
 
+        // Ensure user has a university assigned
+        if (!auth()->user()->university) {
+            abort(403, 'No university assigned to your account. Please contact administrator.');
+        }
+
         return $next($request);
     }
 }
