@@ -30,11 +30,23 @@
 
                     <!-- Desktop Navigation Links -->
                     <div class="hidden md:flex md:items-center md:space-x-4 md:order-1">
-                        <a href="{{ route('university.dashboard') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.dashboard') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors">
+                        <a href="{{ route('university.dashboard') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.dashboard') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
                             Dashboard
                         </a>
-                        <a href="{{ route('university.news.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.news.*') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors">
+                        <a href="{{ route('university.news.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.news.*') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
                             News Submissions
+                        </a>
+                        <a href="{{ route('university.faqs.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('university.faqs.*') ? 'bg-brand-700 text-white' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }} transition-colors flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            FAQs
                         </a>
                     </div>
 
@@ -99,10 +111,28 @@
                     <div class="hidden w-full md:hidden" id="navbar-default">
                         <ul class="font-medium flex flex-col p-4 mt-4 border border-brand-700 rounded-lg bg-brand-800 space-y-1">
                             <li>
-                                <a href="{{ route('university.dashboard') }}" class="block py-2 px-3 rounded {{ request()->routeIs('university.dashboard') ? 'text-white bg-brand-700' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }}" aria-current="page">Dashboard</a>
+                                <a href="{{ route('university.dashboard') }}" class="flex items-center gap-2 py-2 px-3 rounded {{ request()->routeIs('university.dashboard') ? 'text-white bg-brand-700' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }}" aria-current="page">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                    Dashboard
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('university.news.index') }}" class="block py-2 px-3 rounded {{ request()->routeIs('university.news.*') ? 'text-white bg-brand-700' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }}">News Submissions</a>
+                                <a href="{{ route('university.news.index') }}" class="flex items-center gap-2 py-2 px-3 rounded {{ request()->routeIs('university.news.*') ? 'text-white bg-brand-700' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    News Submissions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('university.faqs.index') }}" class="flex items-center gap-2 py-2 px-3 rounded {{ request()->routeIs('university.faqs.*') ? 'text-white bg-brand-700' : 'text-blue-100 hover:bg-brand-700 hover:text-white' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    FAQs
+                                </a>
                             </li>
                             <!-- Mobile User Info -->
                             <li>

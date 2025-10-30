@@ -54,15 +54,15 @@
                                 </div>
                             </div>
                         @elseif($newsSubmission->status === 'approved')
-                            <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
                                 <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-blue-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                     </svg>
                                     <div>
-                                        <p class="text-sm font-medium text-green-800">This submission has been approved</p>
+                                        <p class="text-sm font-medium text-blue-800">This submission has been approved</p>
                                         @if($newsSubmission->approver)
-                                            <p class="text-xs text-green-700 mt-1">
+                                            <p class="text-xs text-blue-700 mt-1">
                                                 Approved by {{ $newsSubmission->approver->name }} on {{ $newsSubmission->approved_at->format('M d, Y \a\t h:i A') }}
                                             </p>
                                         @endif
@@ -167,15 +167,37 @@
                             </a>
 
                             <!-- Approve Button -->
-                            <form action="{{ route('admin.news.approve', $newsSubmission) }}" method="POST" class="mb-3">
+                            <form action="{{ route('admin.news.approve', $newsSubmission) }}" method="POST" class="mb-3" id="approve-form">
                                 @csrf
+                                
+                                <!-- Schedule Option Toggle -->
+                                <div class="mb-3">
+                                    <label class="flex items-center mb-2">
+                                        <input type="checkbox" id="schedule-toggle" onchange="toggleScheduleField()" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                        <span class="ml-2 text-sm text-gray-700">Schedule for later publication</span>
+                                    </label>
+                                    
+                                    <!-- Scheduled Date Field (Hidden by default) -->
+                                    <div id="schedule-field" class="hidden mt-2">
+                                        <label for="scheduled_at" class="block text-xs font-medium text-gray-700 mb-1">
+                                            Scheduled Publication Date & Time
+                                        </label>
+                                        <input type="datetime-local" 
+                                               name="scheduled_at" 
+                                               id="scheduled_at" 
+                                               min="{{ now()->format('Y-m-d\TH:i') }}"
+                                               class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        <p class="mt-1 text-xs text-gray-500">Leave empty to approve immediately</p>
+                                    </div>
+                                </div>
+                                
                                 <button type="submit" 
-                                        onclick="return confirm('Are you sure you want to approve this news submission?')"
+                                        onclick="return confirmApprove()"
                                         class="w-full inline-flex justify-center items-center px-4 py-3 bg-green-600 border border-transparent rounded-lg font-semibold text-sm text-white hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
-                                    Approve Submission
+                                    <span id="approve-button-text">Approve Submission</span>
                                 </button>
                             </form>
 
@@ -227,7 +249,7 @@
                                             Pending Review
                                         </span>
                                     @elseif($newsSubmission->status === 'approved')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             Approved
                                         </span>
                                     @elseif($newsSubmission->status === 'rejected')
@@ -235,7 +257,7 @@
                                             Rejected
                                         </span>
                                     @elseif($newsSubmission->status === 'published')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                             Published
                                         </span>
                                     @else
@@ -352,6 +374,42 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleScheduleField() {
+            const toggle = document.getElementById('schedule-toggle');
+            const field = document.getElementById('schedule-field');
+            const buttonText = document.getElementById('approve-button-text');
+            
+            if (toggle.checked) {
+                field.classList.remove('hidden');
+                buttonText.textContent = 'Approve & Schedule';
+            } else {
+                field.classList.add('hidden');
+                document.getElementById('scheduled_at').value = '';
+                buttonText.textContent = 'Approve Submission';
+            }
+        }
+        
+        function confirmApprove() {
+            const toggle = document.getElementById('schedule-toggle');
+            const scheduledAt = document.getElementById('scheduled_at').value;
+            
+            if (toggle.checked && scheduledAt) {
+                const scheduledDate = new Date(scheduledAt);
+                const now = new Date();
+                
+                if (scheduledDate <= now) {
+                    alert('Scheduled date must be in the future. Please select a future date.');
+                    return false;
+                }
+                
+                return confirm('Are you sure you want to approve and schedule this news submission for ' + scheduledDate.toLocaleString() + '?');
+            } else {
+                return confirm('Are you sure you want to approve this news submission?');
+            }
+        }
+    </script>
 </x-admin-layout>
 
 

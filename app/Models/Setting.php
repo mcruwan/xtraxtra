@@ -63,4 +63,45 @@ class Setting extends Model
         $logoPath = static::get('platform_logo');
         return $logoPath ? Storage::url($logoPath) : null;
     }
+
+    /**
+     * Get Brevo API credentials
+     * 
+     * @return array Returns array with 'key', 'secret', and 'base_url' keys
+     */
+    public static function getBrevoApiCredentials(): array
+    {
+        return [
+            'key' => static::get('bravo_api_key'),
+            'secret' => static::get('bravo_api_secret'),
+            'base_url' => static::get('bravo_api_base_url'),
+        ];
+    }
+
+    /**
+     * Check if Brevo API is configured
+     * 
+     * @return bool
+     */
+    public static function isBrevoApiConfigured(): bool
+    {
+        $credentials = static::getBrevoApiCredentials();
+        return !empty($credentials['key']) && !empty($credentials['secret']);
+    }
+
+    /**
+     * @deprecated Use getBrevoApiCredentials() instead
+     */
+    public static function getBravoApiCredentials(): array
+    {
+        return static::getBrevoApiCredentials();
+    }
+
+    /**
+     * @deprecated Use isBrevoApiConfigured() instead
+     */
+    public static function isBravoApiConfigured(): bool
+    {
+        return static::isBrevoApiConfigured();
+    }
 }

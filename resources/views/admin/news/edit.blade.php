@@ -181,6 +181,55 @@
                             <p class="mt-2 text-xs text-gray-500">Add relevant tags to help categorize your news article.</p>
                         </div>
 
+                        <!-- Status -->
+                        <div>
+                            <label for="status" class="block mb-2 text-sm font-medium text-gray-900">
+                                Status <span class="text-red-500">*</span>
+                            </label>
+                            <select name="status" id="status" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('status') border-red-500 bg-red-50 @enderror"
+                                onchange="handleStatusChange()" required>
+                                <option value="draft" {{ old('status', $newsSubmission->status) === 'draft' ? 'selected' : '' }}>Draft</option>
+                                <option value="pending" {{ old('status', $newsSubmission->status) === 'pending' ? 'selected' : '' }}>Pending Review</option>
+                                <option value="approved" {{ old('status', $newsSubmission->status) === 'approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="scheduled" {{ old('status', $newsSubmission->status) === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                <option value="published" {{ old('status', $newsSubmission->status) === 'published' ? 'selected' : '' }}>Published</option>
+                                <option value="rejected" {{ old('status', $newsSubmission->status) === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            </select>
+                            @error('status')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Scheduled At (shown when status is approved or scheduled) -->
+                        <div id="scheduled_at_field" style="display: {{ in_array(old('status', $newsSubmission->status), ['approved', 'scheduled']) ? 'block' : 'none' }};">
+                            <label for="scheduled_at" class="block mb-2 text-sm font-medium text-gray-900">
+                                Scheduled Publication Date & Time <span class="text-gray-400 text-xs">(Optional - leave empty for immediate approval)</span>
+                            </label>
+                            <input type="datetime-local" name="scheduled_at" id="scheduled_at" 
+                                value="{{ old('scheduled_at', $newsSubmission->scheduled_at ? $newsSubmission->scheduled_at->format('Y-m-d\TH:i') : '') }}"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('scheduled_at') border-red-500 bg-red-50 @enderror">
+                            @error('scheduled_at')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-2 text-xs text-gray-500">If set, the article will be scheduled for publication on this date. If empty, the article will be approved immediately.</p>
+                        </div>
+
+                        <!-- Live URL (shown when status is published) -->
+                        <div id="live_url_field" style="display: {{ old('status', $newsSubmission->status) === 'published' ? 'block' : 'none' }};">
+                            <label for="live_url" class="block mb-2 text-sm font-medium text-gray-900">
+                                Live URL <span class="text-red-500">*</span>
+                            </label>
+                            <input type="url" name="live_url" id="live_url" 
+                                value="{{ old('live_url', $newsSubmission->live_url) }}"
+                                placeholder="https://example.com/article-slug"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('live_url') border-red-500 bg-red-50 @enderror">
+                            @error('live_url')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-2 text-xs text-gray-500">Enter the URL where this article is published.</p>
+                        </div>
+
                         <!-- Admin-only Note -->
                         <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
                             <div class="flex">
@@ -473,6 +522,45 @@
             });
         
         })();
+        
+        // Handle status change to show/hide scheduled_at and live_url fields
+        window.handleStatusChange = function() {
+            const statusSelect = document.getElementById('status');
+            const scheduledAtField = document.getElementById('scheduled_at_field');
+            const scheduledAtInput = document.getElementById('scheduled_at');
+            const liveUrlField = document.getElementById('live_url_field');
+            const liveUrlInput = document.getElementById('live_url');
+            
+            if (statusSelect) {
+                if (statusSelect.value === 'scheduled') {
+                    if (scheduledAtField) scheduledAtField.style.display = 'block';
+                    if (scheduledAtInput) scheduledAtInput.setAttribute('required', 'required');
+                    if (liveUrlField) liveUrlField.style.display = 'none';
+                    if (liveUrlInput) liveUrlInput.removeAttribute('required');
+                } else if (statusSelect.value === 'approved') {
+                    // Show scheduled_at field for approved status (optional)
+                    if (scheduledAtField) scheduledAtField.style.display = 'block';
+                    if (scheduledAtInput) scheduledAtInput.removeAttribute('required');
+                    if (liveUrlField) liveUrlField.style.display = 'none';
+                    if (liveUrlInput) liveUrlInput.removeAttribute('required');
+                } else if (statusSelect.value === 'published') {
+                    if (scheduledAtField) scheduledAtField.style.display = 'none';
+                    if (scheduledAtInput) scheduledAtInput.removeAttribute('required');
+                    if (liveUrlField) liveUrlField.style.display = 'block';
+                    if (liveUrlInput) liveUrlInput.setAttribute('required', 'required');
+                } else {
+                    if (scheduledAtField) scheduledAtField.style.display = 'none';
+                    if (scheduledAtInput) scheduledAtInput.removeAttribute('required');
+                    if (liveUrlField) liveUrlField.style.display = 'none';
+                    if (liveUrlInput) liveUrlInput.removeAttribute('required');
+                }
+            }
+        };
+        
+        // Initialize status change handler on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            handleStatusChange();
+        });
         
         // Image preview function
         window.previewImage = function(event) {

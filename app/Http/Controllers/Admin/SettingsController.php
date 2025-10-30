@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class SettingsController extends Controller
 {
@@ -120,6 +121,117 @@ class SettingsController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'Failed to update settings: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update email and API settings
+     */
+    public function updateEmailApi(Request $request)
+    {
+        $request->validate([
+            'bravo_api_key' => 'nullable|string|max:255',
+            'bravo_api_secret' => 'nullable|string|max:255',
+            'bravo_api_base_url' => 'nullable|url|max:500',
+        ], [
+            'bravo_api_key.max' => 'API key cannot exceed 255 characters.',
+            'bravo_api_secret.max' => 'API secret cannot exceed 255 characters.',
+            'bravo_api_base_url.url' => 'Please provide a valid URL for the API base URL.',
+            'bravo_api_base_url.max' => 'API base URL cannot exceed 500 characters.',
+        ]);
+
+        try {
+            // Update Brevo API Key
+            if ($request->filled('bravo_api_key')) {
+                Setting::set('bravo_api_key', $request->bravo_api_key, 'text', 'Brevo API key for email service integration');
+            }
+            // Note: Only update if provided, don't delete if empty
+
+            // Update Brevo API Secret
+            if ($request->filled('bravo_api_secret')) {
+                Setting::set('bravo_api_secret', $request->bravo_api_secret, 'text', 'Brevo API secret key for email service integration');
+            }
+            // Note: Only update if provided, don't delete if empty
+
+            // Update Brevo API Base URL
+            if ($request->filled('bravo_api_base_url')) {
+                Setting::set('bravo_api_base_url', $request->bravo_api_base_url, 'text', 'Brevo API base URL endpoint');
+            } else {
+                // Allow clearing the base URL explicitly
+                Setting::where('key', 'bravo_api_base_url')->delete();
+            }
+
+            return redirect()
+                ->to(route('admin.settings.index') . '#email-api')
+                ->with('success', 'Email & API settings updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to update email & API settings: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Test Brevo API key validity
+     */
+    public function testBrevoApi(Request $request)
+    {
+        $request->validate([
+            'api_key' => 'required|string',
+            'api_secret' => 'nullable|string',
+            'base_url' => 'nullable|url',
+        ]);
+
+        try {
+            $apiKey = $request->api_key;
+            $baseUrl = $request->base_url ?? 'https://api.brevo.com';
+            
+            // Ensure base URL doesn't end with a slash
+            $baseUrl = rtrim($baseUrl, '/');
+            
+            // Test the API key by fetching account information
+            // Brevo API v3 uses the /account endpoint which requires authentication
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'api-key' => $apiKey,
+                    'Accept' => 'application/json',
+                ])
+                ->get($baseUrl . '/v3/account');
+
+            if ($response->successful()) {
+                $accountData = $response->json();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'API key is valid and working!',
+                    'account' => [
+                        'email' => $accountData['email'] ?? 'N/A',
+                        'firstName' => $accountData['firstName'] ?? 'N/A',
+                        'lastName' => $accountData['lastName'] ?? 'N/A',
+                        'companyName' => $accountData['companyName'] ?? 'N/A',
+                        'plan' => $accountData['plan'] ?? [],
+                    ],
+                ]);
+            } else {
+                $errorData = $response->json();
+                $errorMessage = $errorData['message'] ?? 'Invalid API key or connection failed';
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API key test failed: ' . $errorMessage,
+                    'status_code' => $response->status(),
+                ], $response->status());
+            }
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to connect to Brevo API. Please check your internet connection and API base URL.',
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while testing the API key: ' . $e->getMessage(),
+            ], 500);
         }
     }
 }

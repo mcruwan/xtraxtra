@@ -55,11 +55,31 @@
                         </li>
                         <li class="me-2">
                             <a href="{{ route('admin.news.index', ['status' => 'approved']) }}" 
-                               class="inline-block p-4 {{ request('status') === 'approved' ? 'text-green-600 border-b-2 border-green-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
+                               class="inline-block p-4 {{ request('status') === 'approved' ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
                                aria-current="{{ request('status') === 'approved' ? 'page' : 'false' }}">
                                 Approved
-                                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold {{ request('status') === 'approved' ? 'text-green-800 bg-green-200' : 'text-gray-800 bg-gray-200' }} rounded-full">
+                                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold {{ request('status') === 'approved' ? 'text-blue-800 bg-blue-200' : 'text-gray-800 bg-gray-200' }} rounded-full">
                                     {{ $statusCounts['approved'] }}
+                                </span>
+                            </a>
+                        </li>
+                        <li class="me-2">
+                            <a href="{{ route('admin.news.index', ['status' => 'scheduled']) }}" 
+                               class="inline-block p-4 {{ request('status') === 'scheduled' ? 'text-purple-600 border-b-2 border-purple-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
+                               aria-current="{{ request('status') === 'scheduled' ? 'page' : 'false' }}">
+                                Scheduled
+                                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold {{ request('status') === 'scheduled' ? 'text-purple-800 bg-purple-200' : 'text-gray-800 bg-gray-200' }} rounded-full">
+                                    {{ $statusCounts['scheduled'] }}
+                                </span>
+                            </a>
+                        </li>
+                        <li class="me-2">
+                            <a href="{{ route('admin.news.index', ['status' => 'scheduled_today']) }}" 
+                               class="inline-block p-4 {{ request('status') === 'scheduled_today' ? 'text-indigo-600 border-b-2 border-indigo-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
+                               aria-current="{{ request('status') === 'scheduled_today' ? 'page' : 'false' }}">
+                                Scheduled Today
+                                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold {{ request('status') === 'scheduled_today' ? 'text-indigo-800 bg-indigo-200' : 'text-gray-800 bg-gray-200' }} rounded-full">
+                                    {{ $statusCounts['scheduled_today'] }}
                                 </span>
                             </a>
                         </li>
@@ -75,10 +95,10 @@
                         </li>
                         <li class="me-2">
                             <a href="{{ route('admin.news.index', ['status' => 'published']) }}" 
-                               class="inline-block p-4 {{ request('status') === 'published' ? 'text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
+                               class="inline-block p-4 {{ request('status') === 'published' ? 'text-green-600 border-b-2 border-green-600 rounded-t-lg active' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300' }}" 
                                aria-current="{{ request('status') === 'published' ? 'page' : 'false' }}">
                                 Published
-                                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold {{ request('status') === 'published' ? 'text-blue-800 bg-blue-200' : 'text-gray-800 bg-gray-200' }} rounded-full">
+                                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold {{ request('status') === 'published' ? 'text-green-800 bg-green-200' : 'text-gray-800 bg-gray-200' }} rounded-full">
                                     {{ $statusCounts['published'] }}
                                 </span>
                             </a>
@@ -296,11 +316,18 @@
                                                     Pending
                                                 </span>
                                             @elseif($submission->status === 'approved')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                                     </svg>
                                                     Approved
+                                                </span>
+                                            @elseif($submission->status === 'scheduled')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Scheduled
                                                 </span>
                                             @elseif($submission->status === 'rejected')
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -310,7 +337,7 @@
                                                     Rejected
                                                 </span>
                                             @elseif($submission->status === 'published')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>

@@ -20,7 +20,13 @@ class NewsSubmissionController extends Controller
 
         // Filter by status
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            // Special handling for "scheduled_today" filter
+            if ($request->status === 'scheduled_today') {
+                $query->where('status', 'scheduled')
+                      ->whereDate('scheduled_at', today());
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         // Filter by university
@@ -59,6 +65,8 @@ class NewsSubmissionController extends Controller
             'draft' => NewsSubmission::drafts()->count(),
             'pending' => NewsSubmission::pending()->count(),
             'approved' => NewsSubmission::approved()->count(),
+            'scheduled' => NewsSubmission::scheduled()->count(),
+            'scheduled_today' => NewsSubmission::scheduled()->whereDate('scheduled_at', today())->count(),
             'rejected' => NewsSubmission::rejected()->count(),
             'published' => NewsSubmission::published()->count(),
         ];
@@ -117,6 +125,95 @@ class NewsSubmissionController extends Controller
         // Set last_edited_at timestamp
         $data['last_edited_at'] = now();
         
+        // Handle status changes
+        if (isset($data['status'])) {
+            // When changing to published, ensure published_at is set
+            if ($data['status'] === 'published') {
+                if (!$newsSubmission->published_at) {
+                    $data['published_at'] = now();
+                }
+                // live_url is required by validation, but ensure it's set
+                if (!isset($data['live_url']) || empty($data['live_url'])) {
+                    // This should have been caught by validation, but as a safeguard
+                    return redirect()
+                        ->back()
+                        ->withErrors(['live_url' => 'Live URL is required when publishing an article.'])
+                        ->withInput();
+                }
+                // Clear scheduled_at when publishing
+                $data['scheduled_at'] = null;
+            } else {
+                // Clear live_url if status is not published
+                if ($data['status'] !== 'published') {
+                    $data['live_url'] = null;
+                }
+            }
+            
+            // Handle approved status with scheduling
+            if ($data['status'] === 'approved') {
+                // If scheduled_at is provided and is in the future, automatically change status to scheduled
+                if (isset($data['scheduled_at']) && !empty($data['scheduled_at'])) {
+                    $scheduledAt = \Carbon\Carbon::parse($data['scheduled_at']);
+                    $now = \Carbon\Carbon::now();
+                    
+                    // If scheduled date is in the future, change status to scheduled
+                    if ($scheduledAt->isFuture()) {
+                        $data['status'] = 'scheduled';
+                        // Set approved_at if not already set
+                        if (!$newsSubmission->approved_at) {
+                            $data['approved_at'] = now();
+                            $data['approved_by'] = auth()->id();
+                        }
+                    } else {
+                        // If scheduled date is today or in the past, clear it and keep as approved
+                        $data['scheduled_at'] = null;
+                        // Set approved_at if not already set
+                        if (!$newsSubmission->approved_at) {
+                            $data['approved_at'] = now();
+                            $data['approved_by'] = auth()->id();
+                        }
+                    }
+                } else {
+                    // No scheduled_at provided, set approved_at if not already set
+                    if (!$newsSubmission->approved_at) {
+                        $data['approved_at'] = now();
+                        $data['approved_by'] = auth()->id();
+                    }
+                }
+            }
+            
+            // Handle scheduled status
+            if ($data['status'] === 'scheduled') {
+                // scheduled_at is required by validation, but ensure it's set
+                if (!isset($data['scheduled_at']) || empty($data['scheduled_at'])) {
+                    return redirect()
+                        ->back()
+                        ->withErrors(['scheduled_at' => 'Scheduled date is required when status is scheduled.'])
+                        ->withInput();
+                }
+                
+                // Validate that scheduled_at is in the future
+                $scheduledAt = \Carbon\Carbon::parse($data['scheduled_at']);
+                if (!$scheduledAt->isFuture()) {
+                    return redirect()
+                        ->back()
+                        ->withErrors(['scheduled_at' => 'Scheduled date must be in the future.'])
+                        ->withInput();
+                }
+                
+                // Set approved_at if not already set (since scheduled articles are approved)
+                if (!$newsSubmission->approved_at) {
+                    $data['approved_at'] = now();
+                    $data['approved_by'] = auth()->id();
+                }
+            } else {
+                // Clear scheduled_at if status is not scheduled or approved
+                if ($data['status'] !== 'scheduled' && $data['status'] !== 'approved') {
+                    $data['scheduled_at'] = null;
+                }
+            }
+        }
+        
         $newsSubmission->update($data);
 
         // Sync category (single category only) if provided
@@ -147,16 +244,41 @@ class NewsSubmissionController extends Controller
     {
         Gate::authorize('approve', $newsSubmission);
 
-        $newsSubmission->update([
-            'status' => 'approved',
+        // Check if scheduled_at is provided in the request
+        $scheduledAt = $request->input('scheduled_at');
+        $status = 'approved';
+        
+        // If scheduled_at is provided and is in the future, set status to scheduled
+        if ($scheduledAt && !empty($scheduledAt)) {
+            $scheduledDate = \Carbon\Carbon::parse($scheduledAt);
+            if ($scheduledDate->isFuture()) {
+                $status = 'scheduled';
+            } else {
+                // If scheduled date is today or in the past, ignore it
+                $scheduledAt = null;
+            }
+        }
+
+        $updateData = [
+            'status' => $status,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
             'rejection_reason' => null,
-        ]);
+        ];
+        
+        if ($scheduledAt) {
+            $updateData['scheduled_at'] = \Carbon\Carbon::parse($scheduledAt);
+        }
+
+        $newsSubmission->update($updateData);
+
+        $message = $status === 'scheduled' 
+            ? 'News submission has been approved and scheduled for publication.' 
+            : 'News submission has been approved successfully!';
 
         return redirect()
             ->back()
-            ->with('success', 'News submission has been approved successfully!');
+            ->with('success', $message);
     }
 
     /**

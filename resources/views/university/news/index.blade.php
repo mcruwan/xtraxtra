@@ -54,67 +54,80 @@
             @endif
 
             <!-- Statistics Cards - Flowbite Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2 mb-8">
                 <!-- Total Card -->
-                <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                <div class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Total</p>
-                            <p class="text-xl font-bold text-gray-900">{{ $stats['total'] }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['total'] }}</p>
                         </div>
-                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
                 </div>
                 
                 <!-- Drafts Card -->
-                <a href="{{ route('university.news.index', ['status' => 'draft']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                <a href="{{ route('university.news.index', ['status' => 'draft']) }}" class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Drafts</p>
-                            <p class="text-xl font-bold text-gray-900">{{ $stats['drafts'] }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['drafts'] }}</p>
                         </div>
-                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
                         </svg>
                     </div>
                 </a>
                 
                 <!-- Pending Card -->
-                <a href="{{ route('university.news.index', ['status' => 'pending']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                <a href="{{ route('university.news.index', ['status' => 'pending']) }}" class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Pending</p>
-                            <p class="text-xl font-bold text-gray-900">{{ $stats['pending'] }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['pending'] }}</p>
                         </div>
-                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                 </a>
                 
                 <!-- Approved Card -->
-                <a href="{{ route('university.news.index', ['status' => 'approved']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                <a href="{{ route('university.news.index', ['status' => 'approved']) }}" class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Approved</p>
-                            <p class="text-xl font-bold text-gray-900">{{ $stats['approved'] }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['approved'] }}</p>
                         </div>
-                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                 </a>
                 
+                <!-- Scheduled Card -->
+                <a href="{{ route('university.news.index', ['status' => 'scheduled']) }}" class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Scheduled</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['scheduled'] }}</p>
+                        </div>
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                </a>
+                
                 <!-- Published Card -->
-                <a href="{{ route('university.news.index', ['status' => 'published']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                <a href="{{ route('university.news.index', ['status' => 'published']) }}" class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Published</p>
-                            <p class="text-xl font-bold text-gray-900">{{ $stats['published'] }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['published'] }}</p>
                         </div>
-                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -122,17 +135,30 @@
                 </a>
                 
                 <!-- Rejected Card -->
-                <a href="{{ route('university.news.index', ['status' => 'rejected']) }}" class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                <a href="{{ route('university.news.index', ['status' => 'rejected']) }}" class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">Rejected</p>
-                            <p class="text-xl font-bold text-gray-900">{{ $stats['rejected'] }}</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['rejected'] }}</p>
                         </div>
-                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </div>
                 </a>
+                
+                <!-- This Month Card -->
+                <div class="p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition-shadow duration-200">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-0.5">This Month</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $stats['this_month'] }}</p>
+                        </div>
+                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                </div>
             </div>
 
             <!-- Search and Filters - Flowbite Form -->
@@ -191,6 +217,7 @@
                                 <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Drafts</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Review</option>
                                 <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
                                 <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
                                 <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                             </select>
@@ -235,7 +262,7 @@
                                         }
                                     @endphp
                                     
-                                    <th scope="col" class="px-6 py-3">
+                                    <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                         <a href="{{ getSortUrl('id', $currentSort, $currentDirection) }}" class="flex items-center gap-1.5 cursor-pointer hover:text-gray-900 group transition-colors">
                                             <span>Post ID</span>
                                             <div class="flex flex-col -space-y-0.5">
@@ -248,7 +275,7 @@
                                             </div>
                                         </a>
                                     </th>
-                                    <th scope="col" class="px-6 py-3">
+                                    <th scope="col" class="px-6 py-3 whitespace-nowrap">
                                         <a href="{{ getSortUrl('title', $currentSort, $currentDirection) }}" class="flex items-center gap-1.5 cursor-pointer hover:text-gray-900 group transition-colors">
                                             <span>Title</span>
                                             <div class="flex flex-col -space-y-0.5">
@@ -309,7 +336,10 @@
                                                     </div>
                                                 @endif
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="font-medium text-gray-900 line-clamp-2">{{ $submission->title }}</div>
+                                                    <div class="font-medium text-gray-900 line-clamp-1 mb-0.5">{{ $submission->title }}</div>
+                                                    @if($submission->excerpt)
+                                                        <div class="text-xs text-gray-500 line-clamp-1">{{ Str::limit(strip_tags($submission->excerpt), 80) }}</div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
@@ -328,6 +358,17 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
                                             <div class="flex items-center gap-3 justify-end">
+                                                @if($submission->status === 'published' && $submission->live_url)
+                                                    <a href="{{ $submission->live_url }}" 
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="p-1.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors" 
+                                                       title="View Live Article">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                                        </svg>
+                                                    </a>
+                                                @endif
                                                 <a href="{{ route('university.news.show', $submission) }}" 
                                                    class="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" 
                                                    title="View">

@@ -36,6 +36,7 @@ class NewsSubmissionRequest extends FormRequest
             'tag_names' => ['nullable', 'array'],
             'tag_names.*' => ['string', 'max:255'],
             'status' => ['sometimes', 'in:draft,pending'],
+            'scheduled_at' => ['nullable', 'date'],
         ];
     }
 

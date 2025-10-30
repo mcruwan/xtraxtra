@@ -31,6 +31,9 @@ class AdminNewsEditRequest extends FormRequest
             'categories' => ['required', 'integer', 'exists:categories,id'],
             'tag_names' => ['nullable', 'array'],
             'tag_names.*' => ['string', 'max:255'],
+            'status' => ['nullable', 'in:draft,pending,approved,rejected,published,scheduled'],
+            'scheduled_at' => ['nullable', 'date', 'required_if:status,scheduled'],
+            'live_url' => ['nullable', 'url', 'max:500', 'required_if:status,published'],
         ];
     }
 
@@ -44,6 +47,7 @@ class AdminNewsEditRequest extends FormRequest
         return [
             'categories.*' => 'category',
             'tag_names.*' => 'tag',
+            'live_url' => 'live URL',
         ];
     }
 
@@ -56,6 +60,9 @@ class AdminNewsEditRequest extends FormRequest
     {
         return [
             'featured_image.max' => 'The featured image must not be larger than 2MB.',
+            'live_url.required_if' => 'The live URL is required when status is published.',
+            'live_url.url' => 'The live URL must be a valid URL.',
+            'scheduled_at.required_if' => 'The scheduled date is required when status is scheduled.',
         ];
     }
 }

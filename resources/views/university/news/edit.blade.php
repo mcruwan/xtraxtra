@@ -202,6 +202,19 @@
                             @enderror
                             <p class="mt-2 text-xs text-gray-500">Add relevant tags to help categorize your news article.</p>
                         </div>
+
+                        <!-- Status Selection -->
+                        <div>
+                            <label for="status" class="block mb-2 text-sm font-medium text-gray-900">
+                                Submission Status
+                            </label>
+                            <select name="status" id="status" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <option value="draft" {{ old('status', $newsSubmission->status) === 'draft' ? 'selected' : '' }}>Draft (Save for later)</option>
+                                <option value="pending" {{ old('status', $newsSubmission->status) === 'pending' ? 'selected' : '' }}>Submit for Review</option>
+                            </select>
+                            <p class="mt-2 text-xs text-gray-500">Choose whether to save as draft or submit for admin review.</p>
+                        </div>
                     </div>
                 </form>
             </div>
