@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\NewsSubmission;
+use App\Models\Setting;
 use App\Models\University;
+use App\Notifications\NewsSubmissionApproved;
 use App\Notifications\NewsSubmissionRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -221,7 +223,20 @@ class NewsSubmissionController extends Controller
             }
         }
         
+        // Check if status is changing to approved or scheduled (from pending)
+        $wasApproved = false;
+        if (isset($data['status']) && in_array($data['status'], ['approved', 'scheduled'])) {
+            if ($newsSubmission->status === 'pending') {
+                $wasApproved = true;
+            }
+        }
+        
         $newsSubmission->update($data);
+
+        // Send approval notification if status changed to approved/scheduled from pending
+        if ($wasApproved && Setting::get('enable_approval_notifications', '1') == '1') {
+            $newsSubmission->user->notify(new NewsSubmissionApproved($newsSubmission));
+        }
 
         // Sync category (single category only) if provided
         if (isset($data['categories']) && $data['categories']) {
@@ -239,9 +254,14 @@ class NewsSubmissionController extends Controller
             $newsSubmission->tags()->sync([]);
         }
 
+        $successMessage = 'News article has been updated successfully!';
+        if ($wasApproved) {
+            $successMessage .= ' The university has been notified.';
+        }
+
         return redirect()
             ->route('admin.news.show', $newsSubmission)
-            ->with('success', 'News article has been updated successfully!');
+            ->with('success', $successMessage);
     }
 
     /**
@@ -279,9 +299,14 @@ class NewsSubmissionController extends Controller
 
         $newsSubmission->update($updateData);
 
+        // Send approval notification if enabled
+        if (Setting::get('enable_approval_notifications', '1') == '1') {
+            $newsSubmission->user->notify(new NewsSubmissionApproved($newsSubmission));
+        }
+
         $message = $status === 'scheduled' 
-            ? 'News submission has been approved and scheduled for publication.' 
-            : 'News submission has been approved successfully!';
+            ? 'News submission has been approved and scheduled for publication. The university has been notified.' 
+            : 'News submission has been approved successfully! The university has been notified.';
 
         return redirect()
             ->back()
@@ -330,6 +355,7 @@ class NewsSubmissionController extends Controller
             ->where('status', 'pending')
             ->get();
 
+        $approvedCount = 0;
         foreach ($submissions as $submission) {
             if (Gate::allows('approve', $submission)) {
                 $submission->update([
@@ -337,12 +363,19 @@ class NewsSubmissionController extends Controller
                     'approved_by' => auth()->id(),
                     'approved_at' => now(),
                 ]);
+
+                // Send approval notification if enabled
+                if (Setting::get('enable_approval_notifications', '1') == '1') {
+                    $submission->user->notify(new NewsSubmissionApproved($submission));
+                }
+                
+                $approvedCount++;
             }
         }
 
         return redirect()
             ->back()
-            ->with('success', count($submissions) . ' submission(s) approved successfully!');
+            ->with('success', $approvedCount . ' submission(s) approved successfully and universities have been notified!');
     }
 }
 

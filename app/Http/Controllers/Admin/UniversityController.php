@@ -118,6 +118,9 @@ class UniversityController extends Controller
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
 
+        // Check if status is being changed from pending to active
+        $wasApproved = $university->status === 'pending' && $validated['status'] === 'active';
+
         // Handle logo upload
         if ($request->hasFile('logo')) {
             // Delete old logo if it exists
@@ -128,6 +131,14 @@ class UniversityController extends Controller
         }
 
         $university->update($validated);
+
+        // Send registration approved email if status changed to active from pending
+        if ($wasApproved && \App\Models\Setting::get('enable_registration_approved_notifications', '1') == '1') {
+            $adminUser = $university->adminUser;
+            if ($adminUser) {
+                $adminUser->notify(new \App\Notifications\UniversityRegistrationApproved($university));
+            }
+        }
 
         return redirect()->route('admin.universities.index')
             ->with('success', 'University updated successfully.');
@@ -162,9 +173,17 @@ class UniversityController extends Controller
             // Activate all university users
             $university->users()->update(['status' => 'active']);
 
+            // Send registration approved email to admin user if enabled
+            if (\App\Models\Setting::get('enable_registration_approved_notifications', '1') == '1') {
+                $adminUser = $university->adminUser;
+                if ($adminUser) {
+                    $adminUser->notify(new \App\Notifications\UniversityRegistrationApproved($university));
+                }
+            }
+
             DB::commit();
 
-            return back()->with('success', 'University approved and users activated!');
+            return back()->with('success', 'University approved and users activated! Notification email sent.');
 
         } catch (\Exception $e) {
             DB::rollBack();

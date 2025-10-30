@@ -71,9 +71,19 @@
                             class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             data-tab="email-api">
                             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                             </svg>
                             Email & API
+                        </button>
+                        <button 
+                            onclick="switchTab('email-templates')" 
+                            id="tab-email-templates"
+                            class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            data-tab="email-templates">
+                            <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            Email Templates
                         </button>
                         <!-- Future tabs can be added here -->
                     </nav>
@@ -457,7 +467,357 @@
                     </div>
                 </div>
 
+                <!-- Email Templates Tab Content -->
+                <div id="tab-content-email-templates" class="tab-content hidden">
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900">Email Templates</h2>
+                                    <p class="mt-1 text-sm text-gray-600">Manage email templates for different notifications and communications</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <!-- Templates Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                
+                                <!-- Article Approval Template Card -->
+                                <div class="border border-gray-200 rounded-lg hover:border-blue-500 transition-colors cursor-pointer" onclick="openTemplateEditor('approval')">
+                                    <div class="p-5">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <h3 class="text-lg font-medium text-gray-900">Article Approval</h3>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ isset($settings['enable_approval_notifications']) && $settings['enable_approval_notifications']->value == '1' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                        {{ isset($settings['enable_approval_notifications']) && $settings['enable_approval_notifications']->value == '1' ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </div>
+                                                <p class="mt-2 text-sm text-gray-600">
+                                                    Sent to universities when their news articles are approved by administrators
+                                                </p>
+                                                <div class="mt-4 flex items-center text-sm text-gray-500">
+                                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Last modified: {{ isset($settings['approval_email_template']) ? $settings['approval_email_template']->updated_at->format('M d, Y') : 'Never' }}
+                                                </div>
+                                                <div class="mt-3 flex items-center space-x-2">
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); openTemplateEditor('approval')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                        Edit Template
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); sendTestEmail('approval')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                                        </svg>
+                                                        Send Test
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Article Rejection Template Card -->
+                                <div class="border border-gray-200 rounded-lg hover:border-blue-500 transition-colors cursor-pointer" onclick="openTemplateEditor('rejection')">
+                                    <div class="p-5">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-red-100 text-red-600">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <h3 class="text-lg font-medium text-gray-900">Article Rejection</h3>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ isset($settings['enable_rejection_notifications']) && $settings['enable_rejection_notifications']->value == '1' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                        {{ isset($settings['enable_rejection_notifications']) && $settings['enable_rejection_notifications']->value == '1' ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </div>
+                                                <p class="mt-2 text-sm text-gray-600">
+                                                    Sent to universities when their news articles are rejected with feedback
+                                                </p>
+                                                <div class="mt-4 flex items-center text-sm text-gray-500">
+                                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Last modified: {{ isset($settings['rejection_email_template']) ? $settings['rejection_email_template']->updated_at->format('M d, Y') : 'Never' }}
+                                                </div>
+                                                <div class="mt-3 flex items-center space-x-2">
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); openTemplateEditor('rejection')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                        Edit Template
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); sendTestEmail('rejection')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                                        </svg>
+                                                        Send Test
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Registration Received Template Card -->
+                                <div class="border border-gray-200 rounded-lg hover:border-blue-500 transition-colors cursor-pointer" onclick="openTemplateEditor('registration_received')">
+                                    <div class="p-5">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <h3 class="text-lg font-medium text-gray-900">Registration Received</h3>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ isset($settings['enable_registration_received_notifications']) && $settings['enable_registration_received_notifications']->value == '1' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                        {{ isset($settings['enable_registration_received_notifications']) && $settings['enable_registration_received_notifications']->value == '1' ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </div>
+                                                <p class="mt-2 text-sm text-gray-600">
+                                                    Sent to universities immediately when they register (pending approval)
+                                                </p>
+                                                <div class="mt-4 flex items-center text-sm text-gray-500">
+                                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Last modified: {{ isset($settings['registration_received_email_template']) ? $settings['registration_received_email_template']->updated_at->format('M d, Y') : 'Never' }}
+                                                </div>
+                                                <div class="mt-3 flex items-center space-x-2">
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); openTemplateEditor('registration_received')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                        Edit Template
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); sendTestEmail('registration_received')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                                        </svg>
+                                                        Send Test
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Registration Approved Template Card -->
+                                <div class="border border-gray-200 rounded-lg hover:border-blue-500 transition-colors cursor-pointer" onclick="openTemplateEditor('registration_approved')">
+                                    <div class="p-5">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-green-100 text-green-600">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4 flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <h3 class="text-lg font-medium text-gray-900">Registration Approved</h3>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ isset($settings['enable_registration_approved_notifications']) && $settings['enable_registration_approved_notifications']->value == '1' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                        {{ isset($settings['enable_registration_approved_notifications']) && $settings['enable_registration_approved_notifications']->value == '1' ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </div>
+                                                <p class="mt-2 text-sm text-gray-600">
+                                                    Sent to universities when their registration is approved by admin
+                                                </p>
+                                                <div class="mt-4 flex items-center text-sm text-gray-500">
+                                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Last modified: {{ isset($settings['registration_approved_email_template']) ? $settings['registration_approved_email_template']->updated_at->format('M d, Y') : 'Never' }}
+                                                </div>
+                                                <div class="mt-3 flex items-center space-x-2">
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); openTemplateEditor('registration_approved')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                        Edit Template
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onclick="event.stopPropagation(); sendTestEmail('registration_approved')"
+                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                                        </svg>
+                                                        Send Test
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Placeholder for Future Templates -->
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                                    <div class="p-5 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">More templates coming soon</h3>
+                                        <p class="mt-1 text-sm text-gray-500">Additional email templates will be added here</p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-blue-900 mb-1">About Email Templates</h4>
+                                        <p class="text-sm text-blue-700">
+                                            Click on any template card to edit its content, subject line, and settings. Each template supports dynamic variables that are automatically replaced with actual data when emails are sent. Make sure to test your changes before activating a template.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Future tabs content can be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Email Modal -->
+    <div id="testEmailModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden z-50" onclick="closeTestEmailModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full" onclick="event.stopPropagation()">
+                <!-- Modal Header -->
+                <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Send Test Email</h3>
+                    <button type="button" onclick="closeTestEmailModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <p class="text-sm text-gray-600 mb-4">
+                        Enter your email address to receive a test email with sample data. This will help you preview how the template looks.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="test_recipient_email" class="block text-sm font-medium text-gray-900 mb-2">
+                                Recipient Email Address
+                            </label>
+                            <input 
+                                type="email" 
+                                id="test_recipient_email" 
+                                value="{{ auth()->user()->email }}"
+                                placeholder="your@email.com"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <p class="mt-2 text-xs text-gray-500">The test email will be sent with dummy article data for preview purposes.</p>
+                        </div>
+                        
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <div class="flex">
+                                <svg class="w-5 h-5 text-yellow-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-xs text-yellow-700">Make sure your Brevo API is configured in Email & API settings before sending test emails.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Result Message -->
+                        <div id="testEmailResult" class="hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="border-t border-gray-200 px-6 py-4 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeTestEmailModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="button" id="sendTestBtn" onclick="sendTestEmailNow()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                        <svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                        Send Test Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Template Editor Modal -->
+    <div id="templateEditorModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden z-50" onclick="closeTemplateEditor(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+                <!-- Modal Header -->
+                <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Edit Email Template</h3>
+                    <button type="button" onclick="closeTemplateEditor()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]" id="modalBody">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="border-t border-gray-200 px-6 py-4 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeTemplateEditor()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="saveTemplate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                        Save Template
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -614,10 +974,428 @@
             }
         }
 
+        // Email Template Modal Functions
+        function openTemplateEditor(templateType) {
+            const modal = document.getElementById('templateEditorModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            // Set modal title
+            const titles = {
+                'approval': 'Edit Article Approval Email Template',
+                'rejection': 'Edit Article Rejection Email Template',
+                'registration_received': 'Edit Registration Received Email Template',
+                'registration_approved': 'Edit Registration Approved Email Template'
+            };
+            modalTitle.textContent = titles[templateType] || 'Edit Email Template';
+            
+            // Load template content based on type
+            if (templateType === 'approval') {
+                modalBody.innerHTML = `
+                    <form id="templateForm" method="POST" action="{{ route('admin.settings.update-email-templates') }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="template_type" value="approval">
+                        
+                        <div class="space-y-6">
+                            <!-- Enable/Disable Toggle -->
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Template Status</h4>
+                                    <p class="text-sm text-gray-500 mt-1">Enable or disable this email notification</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="enable_approval_notifications" value="1" class="sr-only peer" ${`{{ isset($settings['enable_approval_notifications']) && $settings['enable_approval_notifications']->value == '1' ? 'checked' : '' }}`}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-900">Active</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Email Subject -->
+                            <div>
+                                <label for="modal_approval_email_subject" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email Subject Line
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="modal_approval_email_subject" 
+                                    name="approval_email_subject" 
+                                    value="{{ old('approval_email_subject', isset($settings['approval_email_subject']) ? $settings['approval_email_subject']->value : 'News Submission Approved - {article_title}') }}"
+                                    placeholder="News Submission Approved - {article_title}"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <p class="mt-2 text-xs text-gray-500">Available variables: {user_name}, {article_title}, {status}, {platform_name}</p>
+                            </div>
+                            
+                            <!-- Email Template -->
+                            <div>
+                                <label for="modal_approval_email_template" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email HTML Template
+                                </label>
+                                <textarea 
+                                    id="modal_approval_email_template" 
+                                    name="approval_email_template" 
+                                    rows="15"
+                                    placeholder="Enter your HTML email template here..."
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono text-xs">{{ old('approval_email_template', isset($settings['approval_email_template']) ? $settings['approval_email_template']->value : '') }}</textarea>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-xs text-gray-500"><strong>Available variables:</strong></p>
+                                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{user_name}</code> - Recipient name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{user_email}</code> - Recipient email</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{article_title}</code> - Article title</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{article_excerpt}</code> - Article excerpt</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{status}</code> - Article status</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{approved_at}</code> - Approval date</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{scheduled_at}</code> - Scheduled date</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{dashboard_url}</code> - Dashboard link</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{university_name}</code> - University name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{approver_name}</code> - Approver name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{platform_name}</code> - Platform name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                `;
+            } else if (templateType === 'rejection') {
+                modalBody.innerHTML = `
+                    <form id="templateForm" method="POST" action="{{ route('admin.settings.update-email-templates') }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="template_type" value="rejection">
+                        
+                        <div class="space-y-6">
+                            <!-- Enable/Disable Toggle -->
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Template Status</h4>
+                                    <p class="text-sm text-gray-500 mt-1">Enable or disable this email notification</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="enable_rejection_notifications" value="1" class="sr-only peer" ${`{{ isset($settings['enable_rejection_notifications']) && $settings['enable_rejection_notifications']->value == '1' ? 'checked' : '' }}`}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-900">Active</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Email Subject -->
+                            <div>
+                                <label for="modal_rejection_email_subject" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email Subject Line
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="modal_rejection_email_subject" 
+                                    name="rejection_email_subject" 
+                                    value="{{ old('rejection_email_subject', isset($settings['rejection_email_subject']) ? $settings['rejection_email_subject']->value : 'News Submission Rejected - {article_title}') }}"
+                                    placeholder="News Submission Rejected - {article_title}"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <p class="mt-2 text-xs text-gray-500">Available variables: {user_name}, {article_title}, {rejection_reason}, {platform_name}</p>
+                            </div>
+                            
+                            <!-- Email Template -->
+                            <div>
+                                <label for="modal_rejection_email_template" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email HTML Template
+                                </label>
+                                <textarea 
+                                    id="modal_rejection_email_template" 
+                                    name="rejection_email_template" 
+                                    rows="15"
+                                    placeholder="Enter your HTML email template here..."
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono text-xs">{{ old('rejection_email_template', isset($settings['rejection_email_template']) ? $settings['rejection_email_template']->value : '') }}</textarea>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-xs text-gray-500"><strong>Available variables:</strong></p>
+                                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{user_name}</code> - Recipient name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{user_email}</code> - Recipient email</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{article_title}</code> - Article title</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{article_excerpt}</code> - Article excerpt</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{status}</code> - Article status</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{rejection_reason}</code> - Rejection reason</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{rejected_at}</code> - Rejection date</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{dashboard_url}</code> - Dashboard link</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{university_name}</code> - University name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{rejector_name}</code> - Rejector name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{platform_name}</code> - Platform name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                `;
+            } else if (templateType === 'registration_received') {
+                modalBody.innerHTML = `
+                    <form id="templateForm" method="POST" action="{{ route('admin.settings.update-email-templates') }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="template_type" value="registration_received">
+                        
+                        <div class="space-y-6">
+                            <!-- Enable/Disable Toggle -->
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Template Status</h4>
+                                    <p class="text-sm text-gray-500 mt-1">Enable or disable this email notification</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="enable_registration_received_notifications" value="1" class="sr-only peer" ${`{{ isset($settings['enable_registration_received_notifications']) && $settings['enable_registration_received_notifications']->value == '1' ? 'checked' : '' }}`}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            
+                            <!-- Email Subject -->
+                            <div>
+                                <label for="modal_registration_received_email_subject" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email Subject Line
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="modal_registration_received_email_subject" 
+                                    name="registration_received_email_subject" 
+                                    value="{{ old('registration_received_email_subject', isset($settings['registration_received_email_subject']) ? $settings['registration_received_email_subject']->value : 'Registration Received - {university_name}') }}"
+                                    placeholder="Registration Received - {university_name}"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <p class="mt-2 text-xs text-gray-500">Available variables: {university_name}, {admin_name}, {platform_name}</p>
+                            </div>
+                            
+                            <!-- Email Template -->
+                            <div>
+                                <label for="modal_registration_received_email_template" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email HTML Template
+                                </label>
+                                <textarea 
+                                    id="modal_registration_received_email_template" 
+                                    name="registration_received_email_template" 
+                                    rows="15"
+                                    placeholder="Enter your HTML email template here..."
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono text-xs">{{ old('registration_received_email_template', isset($settings['registration_received_email_template']) ? $settings['registration_received_email_template']->value : '') }}</textarea>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-xs text-gray-500"><strong>Available variables:</strong></p>
+                                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{university_name}</code> - University name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{admin_name}</code> - Admin name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{admin_email}</code> - Admin email</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{contact_email}</code> - Contact email</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{platform_name}</code> - Platform name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{registered_at}</code> - Registration date</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                `;
+            } else if (templateType === 'registration_approved') {
+                modalBody.innerHTML = `
+                    <form id="templateForm" method="POST" action="{{ route('admin.settings.update-email-templates') }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="template_type" value="registration_approved">
+                        
+                        <div class="space-y-6">
+                            <!-- Enable/Disable Toggle -->
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Template Status</h4>
+                                    <p class="text-sm text-gray-500 mt-1">Enable or disable this email notification</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="enable_registration_approved_notifications" value="1" class="sr-only peer" ${`{{ isset($settings['enable_registration_approved_notifications']) && $settings['enable_registration_approved_notifications']->value == '1' ? 'checked' : '' }}`}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            
+                            <!-- Email Subject -->
+                            <div>
+                                <label for="modal_registration_approved_email_subject" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email Subject Line
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="modal_registration_approved_email_subject" 
+                                    name="registration_approved_email_subject" 
+                                    value="{{ old('registration_approved_email_subject', isset($settings['registration_approved_email_subject']) ? $settings['registration_approved_email_subject']->value : 'Registration Approved - Welcome to {platform_name}!') }}"
+                                    placeholder="Registration Approved - Welcome to {platform_name}!"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <p class="mt-2 text-xs text-gray-500">Available variables: {university_name}, {admin_name}, {platform_name}</p>
+                            </div>
+                            
+                            <!-- Email Template -->
+                            <div>
+                                <label for="modal_registration_approved_email_template" class="block text-sm font-medium text-gray-900 mb-2">
+                                    Email HTML Template
+                                </label>
+                                <textarea 
+                                    id="modal_registration_approved_email_template" 
+                                    name="registration_approved_email_template" 
+                                    rows="15"
+                                    placeholder="Enter your HTML email template here..."
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 font-mono text-xs">{{ old('registration_approved_email_template', isset($settings['registration_approved_email_template']) ? $settings['registration_approved_email_template']->value : '') }}</textarea>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-xs text-gray-500"><strong>Available variables:</strong></p>
+                                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{university_name}</code> - University name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{admin_name}</code> - Admin name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{admin_email}</code> - Admin email</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{contact_email}</code> - Contact email</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{platform_name}</code> - Platform name</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{approved_at}</code> - Approval date</div>
+                                        <div><code class="bg-gray-100 px-1 py-0.5 rounded">{login_url}</code> - Login URL</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                `;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeTemplateEditor(event) {
+            if (event && event.target.id !== 'templateEditorModal') {
+                return;
+            }
+            const modal = document.getElementById('templateEditorModal');
+            modal.classList.add('hidden');
+        }
+        
+        function saveTemplate() {
+            const form = document.getElementById('templateForm');
+            if (form) {
+                form.submit();
+            }
+        }
+        
+        let currentTestTemplateType = '';
+        
+        function sendTestEmail(templateType) {
+            currentTestTemplateType = templateType;
+            const modal = document.getElementById('testEmailModal');
+            const resultDiv = document.getElementById('testEmailResult');
+            
+            // Reset result div
+            resultDiv.classList.add('hidden');
+            resultDiv.innerHTML = '';
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        }
+        
+        function closeTestEmailModal(event) {
+            if (event && event.target.id !== 'testEmailModal') {
+                return;
+            }
+            const modal = document.getElementById('testEmailModal');
+            modal.classList.add('hidden');
+            currentTestTemplateType = '';
+        }
+        
+        function sendTestEmailNow() {
+            const emailInput = document.getElementById('test_recipient_email');
+            const sendBtn = document.getElementById('sendTestBtn');
+            const resultDiv = document.getElementById('testEmailResult');
+            const email = emailInput.value.trim();
+            
+            // Validate email
+            if (!email) {
+                showTestResult('error', 'Please enter an email address.');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showTestResult('error', 'Please enter a valid email address.');
+                return;
+            }
+            
+            // Disable button and show loading state
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<svg class="animate-spin w-4 h-4 inline-block mr-1.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
+            
+            // Clear previous result
+            resultDiv.classList.add('hidden');
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                             document.querySelector('input[name="_token"]')?.value;
+            
+            // Make AJAX request
+            fetch('{{ route("admin.settings.send-test-email") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    template_type: currentTestTemplateType,
+                    recipient_email: email,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showTestResult('success', data.message);
+                    // Close modal after 2 seconds
+                    setTimeout(() => {
+                        closeTestEmailModal();
+                    }, 2000);
+                } else {
+                    showTestResult('error', data.message);
+                }
+            })
+            .catch(error => {
+                showTestResult('error', 'An error occurred while sending the test email. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable button
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<svg class="w-4 h-4 inline-block mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg> Send Test Email';
+            });
+        }
+        
+        function showTestResult(type, message) {
+            const resultDiv = document.getElementById('testEmailResult');
+            resultDiv.classList.remove('hidden');
+            
+            if (type === 'success') {
+                resultDiv.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-green-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-green-800">${message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-red-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-red-800">${message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
         // Load tab from URL hash on page load
         document.addEventListener('DOMContentLoaded', function() {
             const hash = window.location.hash.substring(1);
-            if (hash && (hash === 'general' || hash === 'email-api')) {
+            if (hash && (hash === 'general' || hash === 'email-api' || hash === 'email-templates')) {
                 switchTab(hash);
             } else {
                 // Default to general tab
