@@ -11,8 +11,8 @@
             <div class="mb-8">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div class="flex items-center gap-4">
-                        @if(Auth::user()->university->logo)
-                            <img src="{{ Storage::disk('public')->url(Auth::user()->university->logo) }}" 
+                        @if(Auth::user()->university->logo_url)
+                            <img src="{{ Auth::user()->university->logo_url }}" 
                                  alt="{{ Auth::user()->university->name }} logo" 
                                  class="h-16 w-auto object-contain">
                         @else

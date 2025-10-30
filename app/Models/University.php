@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class University extends Model
 {
@@ -19,6 +21,37 @@ class University extends Model
     protected $casts = [
         'status' => 'string',
     ];
+    
+    /**
+     * Get the logo URL attribute.
+     * Returns null if logo doesn't exist or file can't be accessed.
+     */
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (!$this->logo) {
+            return null;
+        }
+        
+        // Check if file exists in storage
+        if (!Storage::disk('public')->exists($this->logo)) {
+            Log::warning("University logo file not found in storage", [
+                'university_id' => $this->id,
+                'logo_path' => $this->logo,
+                'full_path' => Storage::disk('public')->path($this->logo)
+            ]);
+            return null;
+        }
+        
+        return Storage::disk('public')->url($this->logo);
+    }
+    
+    /**
+     * Check if the university has a valid logo.
+     */
+    public function hasLogo(): bool
+    {
+        return $this->logo && Storage::disk('public')->exists($this->logo);
+    }
 
     /**
      * Get the users for the university.

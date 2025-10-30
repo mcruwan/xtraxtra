@@ -69,10 +69,10 @@
                             <label for="logo" class="block mb-2 text-sm font-medium text-gray-900">
                                 University Logo (optional)
                             </label>
-                            @if($university->logo)
+                            @if($university->logo_url)
                                 <div class="mb-4">
                                     <p class="text-sm text-gray-600 mb-2">Current Logo:</p>
-                                    <img src="{{ Storage::disk('public')->url($university->logo) }}" alt="{{ $university->name }}" class="h-20 w-48 object-cover rounded-lg border border-gray-200">
+                                    <img src="{{ $university->logo_url }}" alt="{{ $university->name }}" class="h-20 w-48 object-cover rounded-lg border border-gray-200">
                                 </div>
                             @endif
                             <input type="file" 
