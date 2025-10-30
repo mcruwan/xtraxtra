@@ -129,6 +129,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('settings.update-email-api');
     Route::post('/settings/test-brevo-api', [App\Http\Controllers\Admin\SettingsController::class, 'testBrevoApi'])
         ->name('settings.test-brevo-api');
+    
+    // Storage diagnostics
+    Route::get('/diagnostics/storage', [App\Http\Controllers\Admin\StorageDiagnosticController::class, 'index'])
+        ->name('diagnostics.storage');
 });
 
 // University routes
