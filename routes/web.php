@@ -86,6 +86,23 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('news.reject');
     Route::post('/news/bulk-approve', [App\Http\Controllers\Admin\NewsSubmissionController::class, 'bulkApprove'])
         ->name('news.bulk-approve');
+    
+    // FAQ management
+    Route::resource('faqs', App\Http\Controllers\Admin\FaqController::class);
+    
+    // Settings management
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
+        ->name('settings.index');
+    Route::post('/settings/logo', [App\Http\Controllers\Admin\SettingsController::class, 'updateLogo'])
+        ->name('settings.logo.update');
+    Route::delete('/settings/logo', [App\Http\Controllers\Admin\SettingsController::class, 'removeLogo'])
+        ->name('settings.logo.remove');
+    Route::put('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])
+        ->name('settings.update');
+    Route::put('/settings/email-api', [App\Http\Controllers\Admin\SettingsController::class, 'updateEmailApi'])
+        ->name('settings.update-email-api');
+    Route::post('/settings/test-brevo-api', [App\Http\Controllers\Admin\SettingsController::class, 'testBrevoApi'])
+        ->name('settings.test-brevo-api');
 });
 
 // University routes
@@ -94,6 +111,10 @@ Route::middleware(['auth', 'university_user'])->prefix('university')->name('univ
     
     // News submissions
     Route::resource('news', App\Http\Controllers\University\NewsSubmissionController::class);
+    
+    // FAQs (read-only for universities - knowledge base)
+    Route::get('/faqs', [App\Http\Controllers\University\FaqController::class, 'index'])->name('faqs.index');
+    Route::get('/faqs/{faq}', [App\Http\Controllers\University\FaqController::class, 'show'])->name('faqs.show');
 });
 
 // Profile routes (accessible to all authenticated users)

@@ -22,7 +22,9 @@ class NewsSubmission extends Model
         'rejection_reason',
         'submitted_at',
         'approved_at',
+        'scheduled_at',
         'published_at',
+        'live_url',
         'wordpress_post_id',
         'is_revision',
         'previous_status',
@@ -32,6 +34,7 @@ class NewsSubmission extends Model
     protected $casts = [
         'submitted_at' => 'datetime',
         'approved_at' => 'datetime',
+        'scheduled_at' => 'datetime',
         'published_at' => 'datetime',
         'last_edited_at' => 'datetime',
         'is_revision' => 'boolean',
@@ -56,13 +59,45 @@ class NewsSubmission extends Model
 
         // Automatically set published_at when status changes to published
         static::updating(function ($newsSubmission) {
+            // Handle approved status with scheduling - check if scheduled_at is set and in the future
+            if ($newsSubmission->status === 'approved' && $newsSubmission->isDirty('scheduled_at')) {
+                if ($newsSubmission->scheduled_at && $newsSubmission->scheduled_at->isFuture()) {
+                    // If scheduled_at is in the future, automatically change status to scheduled
+                    $newsSubmission->status = 'scheduled';
+                } elseif ($newsSubmission->scheduled_at && !$newsSubmission->scheduled_at->isFuture()) {
+                    // If scheduled_at is today or in the past, clear it
+                    $newsSubmission->scheduled_at = null;
+                }
+            }
+            
             if ($newsSubmission->isDirty('status')) {
+                // Handle published status
                 if ($newsSubmission->status === 'published' && !$newsSubmission->published_at) {
                     $newsSubmission->published_at = now();
                 }
                 // Clear published_at if status changes away from published
                 if ($newsSubmission->status !== 'published' && $newsSubmission->published_at) {
                     $newsSubmission->published_at = null;
+                }
+                
+                // Handle scheduled status
+                if ($newsSubmission->status === 'scheduled') {
+                    // Ensure scheduled_at is set and is in the future
+                    if (!$newsSubmission->scheduled_at) {
+                        // If no scheduled_at is provided, set it to now
+                        $newsSubmission->scheduled_at = now();
+                    } elseif (!$newsSubmission->scheduled_at->isFuture()) {
+                        // If scheduled_at is not in the future, change status back to approved
+                        $newsSubmission->status = 'approved';
+                        $newsSubmission->scheduled_at = null;
+                    }
+                }
+                // Clear scheduled_at if status changes away from scheduled
+                if ($newsSubmission->status !== 'scheduled' && $newsSubmission->scheduled_at) {
+                    // Only clear if status is not approved (approved can have scheduled_at for future dates)
+                    if ($newsSubmission->status !== 'approved') {
+                        $newsSubmission->scheduled_at = null;
+                    }
                 }
             }
         });
@@ -141,6 +176,14 @@ class NewsSubmission extends Model
     }
 
     /**
+     * Scope: Get scheduled submissions only
+     */
+    public function scopeScheduled($query)
+    {
+        return $query->where('status', 'scheduled');
+    }
+
+    /**
      * Scope: Get published submissions only
      */
     public function scopePublished($query)
@@ -178,6 +221,14 @@ class NewsSubmission extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Check if submission is scheduled
+     */
+    public function isScheduled(): bool
+    {
+        return $this->status === 'scheduled';
     }
 
     /**

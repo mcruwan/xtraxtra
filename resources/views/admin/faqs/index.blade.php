@@ -5,24 +5,24 @@
             <div class="mb-8">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h1 class="text-3xl font-bold tracking-tight text-gray-900">News Categories</h1>
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900">FAQs</h1>
                         <p class="mt-2 text-sm text-gray-600">
-                            Manage news categories that universities can use when submitting articles
+                            Manage frequently asked questions for all universities
                         </p>
                     </div>
-                    <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
+                    <a href="{{ route('admin.faqs.create') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Add New Category
+                        Add New FAQ
                     </a>
                 </div>
             </div>
 
             <!-- Search and Filter Bar -->
             <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
-                <form method="GET" action="{{ route('admin.categories.index') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <form method="GET" action="{{ route('admin.faqs.index') }}" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- Search -->
                         <div class="md:col-span-2">
                             <label for="search" class="block mb-2 text-sm font-medium text-gray-900">Search</label>
@@ -31,20 +31,36 @@
                                 id="search" 
                                 name="search" 
                                 value="{{ request('search') }}"
-                                placeholder="Search by name, slug, or description..."
+                                placeholder="Search by question or answer..."
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
 
-                        <!-- Sort -->
+                        <!-- University Filter -->
                         <div>
-                            <label for="sort_by" class="block mb-2 text-sm font-medium text-gray-900">Sort By</label>
+                            <label for="university_id" class="block mb-2 text-sm font-medium text-gray-900">University</label>
                             <select 
-                                id="sort_by" 
-                                name="sort_by"
+                                id="university_id" 
+                                name="university_id"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                <option value="name" {{ $sortBy === 'name' ? 'selected' : '' }}>Name</option>
-                                <option value="created_at" {{ $sortBy === 'created_at' ? 'selected' : '' }}>Date Created</option>
-                                <option value="updated_at" {{ $sortBy === 'updated_at' ? 'selected' : '' }}>Date Updated</option>
+                                <option value="">All Universities</option>
+                                @foreach($universities as $university)
+                                    <option value="{{ $university->id }}" {{ request('university_id') == $university->id ? 'selected' : '' }}>
+                                        {{ $university->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div>
+                            <label for="is_active" class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                            <select 
+                                id="is_active" 
+                                name="is_active"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <option value="">All Statuses</option>
+                                <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Active</option>
+                                <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Inactive</option>
                             </select>
                         </div>
                     </div>
@@ -59,8 +75,8 @@
                                 </svg>
                                 Search
                             </button>
-                            @if(request('search') || request('sort_by'))
-                                <a href="{{ route('admin.categories.index') }}" class="text-sm text-gray-600 hover:text-gray-900">Clear Filters</a>
+                            @if(request('search') || request('university_id') || request('is_active'))
+                                <a href="{{ route('admin.faqs.index') }}" class="text-sm text-gray-600 hover:text-gray-900">Clear Filters</a>
                             @endif
                         </div>
                     </div>
@@ -90,63 +106,58 @@
                 </div>
             @endif
 
-            <!-- Categories Table -->
-            @if($categories->count() > 0)
+            <!-- FAQs Table -->
+            @if($faqs->count() > 0)
                 <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Slug</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Submissions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Question</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">University</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Order</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Created</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-900 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
-                                @foreach($categories as $category)
+                                @foreach($faqs as $faq)
                                     <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-blue-100">
-                                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                                    </svg>
-                                                </div>
-                                                <div class="ml-4">
-                                                    <p class="text-sm font-semibold text-gray-900">{{ $category->name }}</p>
-                                                    @if($category->description)
-                                                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">{{ $category->description }}</p>
-                                                    @endif
-                                                </div>
+                                        <td class="px-6 py-4">
+                                            <div class="max-w-md">
+                                                <p class="text-sm font-semibold text-gray-900 line-clamp-2">{{ $faq->question }}</p>
+                                                <p class="text-xs text-gray-500 mt-1 line-clamp-2">{!! strip_tags($faq->answer) !!}</p>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <code class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">{{ $category->slug }}</code>
+                                            <span class="text-sm text-gray-900">{{ $faq->university->name }}</span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                                {{ $category->news_submissions_count }}
+                                            <span class="text-sm text-gray-600">{{ $faq->order }}</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $faq->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                                {{ $faq->is_active ? 'Active' : 'Inactive' }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            {{ $category->created_at->format('M d, Y') }}
+                                            {{ $faq->created_at->format('M d, Y') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
                                             <div class="flex items-center justify-end gap-2">
-                                                <a href="{{ route('admin.categories.show', $category) }}" class="text-blue-600 hover:text-blue-900 font-medium text-sm transition-colors" title="View">
+                                                <a href="{{ route('admin.faqs.show', $faq) }}" class="text-blue-600 hover:text-blue-900 font-medium text-sm transition-colors" title="View">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                     </svg>
                                                 </a>
-                                                <a href="{{ route('admin.categories.edit', $category) }}" class="text-green-600 hover:text-green-900 font-medium text-sm transition-colors" title="Edit">
+                                                <a href="{{ route('admin.faqs.edit', $faq) }}" class="text-green-600 hover:text-green-900 font-medium text-sm transition-colors" title="Edit">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                     </svg>
                                                 </a>
-                                                <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                                <form method="POST" action="{{ route('admin.faqs.destroy', $faq) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this FAQ?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900 font-medium text-sm transition-colors" title="Delete">
@@ -162,37 +173,39 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
 
-                <!-- Pagination -->
-                @if($categories->hasPages())
-                    <div class="mt-6">
-                        {{ $categories->links() }}
-                    </div>
-                @endif
+                    <!-- Pagination -->
+                    @if($faqs->hasPages())
+                        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                            {{ $faqs->links('vendor.pagination.tailwind') }}
+                        </div>
+                    @endif
+                </div>
             @else
                 <!-- Empty State -->
-                <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-12">
-                    <div class="text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                        </svg>
-                        <h3 class="mt-4 text-lg font-medium text-gray-900">No categories found</h3>
-                        <p class="mt-2 text-sm text-gray-600">Get started by creating your first news category.</p>
-                        <div class="mt-6">
-                            <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Create Category
-                            </a>
-                        </div>
-                    </div>
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-16 text-center">
+                    <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No FAQs found</h3>
+                    <p class="text-sm text-gray-500 mb-6">
+                        @if(request('search') || request('university_id') || request('is_active'))
+                            No FAQs match your search criteria.
+                        @else
+                            Get started by creating your first FAQ.
+                        @endif
+                    </p>
+                    @if(!request('search') && !request('university_id') && !request('is_active'))
+                        <a href="{{ route('admin.faqs.create') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Add New FAQ
+                        </a>
+                    @endif
                 </div>
             @endif
         </div>
     </div>
 </x-admin-layout>
-
-
 

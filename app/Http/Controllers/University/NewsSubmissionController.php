@@ -61,8 +61,13 @@ class NewsSubmissionController extends Controller
             'drafts' => Auth::user()->university->newsSubmissions()->drafts()->count(),
             'pending' => Auth::user()->university->newsSubmissions()->pending()->count(),
             'approved' => Auth::user()->university->newsSubmissions()->approved()->count(),
+            'scheduled' => Auth::user()->university->newsSubmissions()->scheduled()->count(),
             'published' => Auth::user()->university->newsSubmissions()->published()->count(),
             'rejected' => Auth::user()->university->newsSubmissions()->rejected()->count(),
+            'this_month' => Auth::user()->university->newsSubmissions()
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->count(),
         ];
 
         return view('university.news.index', compact('newsSubmissions', 'stats', 'status', 'search', 'sortBy', 'sortDirection'));
@@ -113,6 +118,16 @@ class NewsSubmissionController extends Controller
         if (isset($data['status']) && $data['status'] === 'pending') {
             $data['submitted_at'] = now();
         }
+        
+        // Universities cannot schedule articles - only admins can do that
+        // Ensure status is either draft or pending
+        if (isset($data['status']) && $data['status'] === 'scheduled') {
+            $data['status'] = 'pending'; // Convert scheduled to pending
+            $data['submitted_at'] = now();
+        }
+        
+        // Remove scheduled_at if present (universities can't set this)
+        unset($data['scheduled_at']);
 
         // Create news submission
         $newsSubmission = NewsSubmission::create($data);
@@ -238,11 +253,24 @@ class NewsSubmissionController extends Controller
             // Clear approval data since it needs re-approval
             $data['approved_by'] = null;
             $data['approved_at'] = null;
+            // Clear scheduled_at and live_url when resubmitting
+            $data['scheduled_at'] = null;
+            $data['live_url'] = null;
         } else {
             // Set submitted_at if status changed to pending from draft
             if (isset($data['status']) && $data['status'] === 'pending' && $newsSubmission->status === 'draft') {
                 $data['submitted_at'] = now();
             }
+            
+            // Universities cannot schedule articles - only admins can do that
+            // If status is scheduled, convert it to pending
+            if (isset($data['status']) && $data['status'] === 'scheduled') {
+                $data['status'] = 'pending';
+                $data['submitted_at'] = now();
+            }
+            
+            // Remove scheduled_at if present (universities can't set this)
+            unset($data['scheduled_at']);
         }
 
         // Update news submission
@@ -281,7 +309,7 @@ class NewsSubmissionController extends Controller
         // Set appropriate success message
         if ($wasApprovedOrPublished) {
             $message = 'Your changes have been saved and the article has been resubmitted for approval.';
-        } elseif ($newsSubmission->status === 'pending') {
+        } elseif (isset($data['status']) && $data['status'] === 'pending') {
             $message = 'News submission submitted for approval successfully!';
         } else {
             $message = 'News submission updated successfully!';

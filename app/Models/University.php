@@ -37,6 +37,14 @@ class University extends Model
     }
 
     /**
+     * Get the FAQs for the university.
+     */
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(Faq::class);
+    }
+
+    /**
      * Scope a query to only include active universities.
      */
     public function scopeActive($query)

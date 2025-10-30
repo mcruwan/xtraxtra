@@ -25,28 +25,22 @@ $statusConfig = [
         'label' => 'Inactive',
     ],
     'approved' => [
-        'bg' => 'bg-green-100',
-        'text' => 'text-green-800',
-        'ring' => 'ring-green-600/20',
-        'label' => 'Approved',
-    ],
-    'rejected' => [
-        'bg' => 'bg-red-100',
-        'text' => 'text-red-800',
-        'ring' => 'ring-red-600/20',
-        'label' => 'Rejected',
-    ],
-    'draft' => [
-        'bg' => 'bg-gray-100',
-        'text' => 'text-gray-800',
-        'ring' => 'ring-gray-600/20',
-        'label' => 'Draft',
-    ],
-    'published' => [
         'bg' => 'bg-blue-100',
         'text' => 'text-blue-800',
         'ring' => 'ring-blue-600/20',
+        'label' => 'Approved',
+    ],
+    'published' => [
+        'bg' => 'bg-green-100',
+        'text' => 'text-green-800',
+        'ring' => 'ring-green-600/20',
         'label' => 'Published',
+    ],
+    'scheduled' => [
+        'bg' => 'bg-purple-100',
+        'text' => 'text-purple-800',
+        'ring' => 'ring-purple-600/20',
+        'label' => 'Scheduled',
     ],
 ];
 
