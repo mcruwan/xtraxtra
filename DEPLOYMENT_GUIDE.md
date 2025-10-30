@@ -2,47 +2,98 @@
 
 This guide explains how to properly deploy your Laravel application with Flowbite to a live production server.
 
+## ⚠️ CRITICAL: Fix for 404 CSS/JS Errors
+
+**Every time you push code to git and deploy, you MUST rebuild assets on your server!**
+
+### The Problem
+When you see this error:
+```
+app-C2rjbO7F.css:1 Failed to load resource: the server responded with a status of 404 ()
+```
+
+This happens because:
+- Your code references built assets via `manifest.json`
+- But `public/build/` is in `.gitignore` (not committed)
+- The built files don't exist on your server
+
+### The Solution ⚡
+**Run this on your server after EVERY git pull:**
+
+```bash
+npm install
+npm run build
+```
+
+Or use the automated script:
+```bash
+bash deploy-server.sh  # Linux/Mac
+# OR
+deploy-server.bat      # Windows
+```
+
+**See `POST_DEPLOYMENT_CHECKLIST.md` for the complete checklist.**
+
+---
+
 ## ⚠️ Important: Why Your Live Server Might Not Be Working
 
 When you install npm packages (like Flowbite) in development, they are **not automatically included** in your production build. You need to:
 
 1. **Build the assets** for production
-2. **Commit the built files** to your repository (or deploy them separately)
-3. **Run npm install and build** on the server (recommended)
+2. **Run npm install and build** on the server after every deployment (recommended)
+3. **Never commit** `public/build/` to git (it's in .gitignore)
 
 ## 🚀 Correct Deployment Process
 
-### Option 1: Build Locally and Commit (Simpler)
+### Option 1: Build on Server (Recommended ⭐)
 
-**On your local machine:**
+**This is the recommended approach and prevents the 404 error!**
 
-1. **Install dependencies** (if not already done):
+**On your live server:**
+
+Use the automated script:
+```bash
+bash deploy-server.sh  # Linux/Mac
+# OR
+deploy-server.bat      # Windows
+```
+
+Or manually:
+1. **Navigate to your project directory**:
+   ```bash
+   cd /path/to/your/project
+   ```
+
+2. **Pull latest code**:
+   ```bash
+   git pull origin main  # or your branch name
+   ```
+
+3. **Install Node.js dependencies**:
    ```bash
    npm install
    ```
+   ⚠️ **Note:** Make sure Node.js and npm are installed on your server!
 
-2. **Build for production**:
+4. **Build assets for production** ⚠️ **CRITICAL - DO THIS EVERY TIME!**:
    ```bash
    npm run build
    ```
 
-3. **Check what was created**:
-   - A `public/build/` directory with compiled assets
-   - A `public/build/manifest.json` file
-
-4. **Commit the built files**:
+5. **Set proper permissions** (if needed):
    ```bash
-   git add public/build/
-   git commit -m "Build assets for production with Flowbite"
-   git push
+   chmod -R 755 public/build
    ```
 
-5. **On your live server:**
-   - Pull the latest code (which includes `public/build/`)
-   - Make sure `public/build/` directory and files are deployed
-   - Your application should now work!
+6. **Clear Laravel caches**:
+   ```bash
+   php artisan config:clear
+   php artisan cache:clear
+   php artisan view:clear
+   ```
 
-### Option 2: Build on Server (Recommended for Production)
+### Option 2: Build Locally and Upload (Alternative)
 
 **On your live server:**
 
@@ -106,13 +157,46 @@ When you run `npm run build`, Vite will:
 
 ## 🛠️ Troubleshooting
 
-### Problem: CSS/JS files return 404
+### Problem: CSS/JS files return 404 ⚠️ MOST COMMON ISSUE
+
+**Symptoms:**
+```
+app-C2rjbO7F.css:1 Failed to load resource: the server responded with a status of 404 ()
+```
+
+**Root Cause:**
+- `public/build/` is in `.gitignore` (not committed to git)
+- After pulling code, the build files don't exist on the server
+- Laravel's `@vite()` directive looks for files that aren't there
 
 **Solution:**
-- Make sure `public/build/` directory exists
-- Make sure `public/build/manifest.json` exists
-- Verify file permissions: `chmod -R 755 public/build`
-- Run `npm run build` again
+1. **Run on your server after EVERY git pull:**
+   ```bash
+   npm install
+   npm run build
+   ```
+
+2. **Verify files exist:**
+   ```bash
+   ls -la public/build/manifest.json
+   ls -la public/build/assets/
+   ```
+
+3. **Check file permissions:**
+   ```bash
+   chmod -R 755 public/build
+   ```
+
+4. **Clear Laravel caches:**
+   ```bash
+   php artisan config:clear
+   php artisan cache:clear
+   php artisan view:clear
+   ```
+
+5. **Clear browser cache** (Ctrl+Shift+R or Cmd+Shift+R)
+
+**Prevention:** Always run `npm run build` on your server after pulling code. Use `deploy-server.sh` or `deploy-server.bat` to automate this process.
 
 ### Problem: Flowbite styles not showing
 
