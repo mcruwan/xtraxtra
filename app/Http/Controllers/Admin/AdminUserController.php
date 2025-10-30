@@ -139,27 +139,15 @@ class AdminUserController extends Controller
 
     /**
      * Remove the specified admin user from storage
+     * 
+     * DISABLED: User deletion is not allowed for security reasons.
      */
     public function destroy(User $adminUser)
     {
-        // Ensure we're deleting an admin/super_admin user
-        if (!in_array($adminUser->role, ['admin', 'super_admin'])) {
-            abort(404);
-        }
-
-        // Prevent deleting the currently logged-in user
-        if ($adminUser->id === auth()->id()) {
-            return redirect()
-                ->back()
-                ->with('error', 'You cannot delete your own account.');
-        }
-
-        $adminUserEmail = $adminUser->email;
-        $adminUser->delete();
-
+        // User deletion is disabled for all users
         return redirect()
-            ->route('admin.admin-users.index')
-            ->with('success', "Admin user '{$adminUserEmail}' deleted successfully!");
+            ->back()
+            ->with('error', 'User deletion is disabled. Users cannot be deleted for security and data integrity reasons.');
     }
 }
 
