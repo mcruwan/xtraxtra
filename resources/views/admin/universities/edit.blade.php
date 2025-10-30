@@ -72,7 +72,7 @@
                             @if($university->logo)
                                 <div class="mb-4">
                                     <p class="text-sm text-gray-600 mb-2">Current Logo:</p>
-                                    <img src="{{ Storage::url($university->logo) }}" alt="{{ $university->name }}" class="h-20 w-48 object-cover rounded-lg border border-gray-200">
+                                    <img src="{{ Storage::disk('public')->url($university->logo) }}" alt="{{ $university->name }}" class="h-20 w-48 object-cover rounded-lg border border-gray-200">
                                 </div>
                             @endif
                             <input type="file" 
