@@ -1,7 +1,15 @@
 @echo off
+REM ==========================================
+REM ⚠️ IMPORTANT: ALWAYS USE THIS SCRIPT BEFORE PUSHING TO GIT!
+REM ==========================================
 REM Build and Push Script
 REM Builds assets and pushes to git for server deployment
+REM 
+REM WHY: Your server doesn't have Node.js, so built files MUST be in git
+REM       This prevents 404 CSS/JS errors on your live server
+REM 
 REM Usage: build-and-push.bat
+REM ==========================================
 
 echo ==========================================
 echo Building Assets and Pushing to Git
