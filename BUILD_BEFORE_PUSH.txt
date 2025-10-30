@@ -1,0 +1,5 @@
+⚠️ ALWAYS BUILD BEFORE PUSHING TO GIT! ⚠️
+
+Run: build-and-push.bat
+
+See GIT_PUSH_INSTRUCTIONS.md for details.

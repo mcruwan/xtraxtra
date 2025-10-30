@@ -13,6 +13,11 @@ class DashboardController extends Controller
     {
         $university = auth()->user()->university;
         
+        // Check if user has a university assigned
+        if (!$university) {
+            abort(403, 'No university assigned to your account. Please contact administrator.');
+        }
+        
         // Basic stats
         $stats = [
             'total_news' => $university->newsSubmissions()->count(),

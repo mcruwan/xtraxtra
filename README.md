@@ -7,6 +7,19 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## ⚠️ IMPORTANT: Build Before Pushing to Git
+
+**Before pushing code to git, ALWAYS run:**
+```batch
+build-and-push.bat
+```
+
+This builds your assets and includes them in git. **Your server doesn't have Node.js, so built files must be committed.**
+
+📋 **See [GIT_PUSH_INSTRUCTIONS.md](GIT_PUSH_INSTRUCTIONS.md) for complete instructions.**
+
+---
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
