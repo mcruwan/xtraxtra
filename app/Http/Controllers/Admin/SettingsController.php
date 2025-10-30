@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 
 class SettingsController extends Controller
 {
@@ -15,6 +16,14 @@ class SettingsController extends Controller
      */
     public function index()
     {
+        // Check if settings table exists
+        if (!Schema::hasTable('settings')) {
+            // Return empty collection if table doesn't exist
+            $settings = collect([]);
+            return view('admin.settings.index', compact('settings'))
+                ->with('warning', 'Settings table does not exist. Please run the migration first.');
+        }
+        
         $settings = Setting::all()->keyBy('key');
         
         return view('admin.settings.index', compact('settings'));
@@ -25,6 +34,13 @@ class SettingsController extends Controller
      */
     public function updateLogo(Request $request)
     {
+        // Check if settings table exists
+        if (!Schema::hasTable('settings')) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Settings table does not exist. Please run the migration first.');
+        }
+
         $validated = $request->validate([
             'platform_logo' => 'required|image|mimes:jpeg,jpg,png,gif,svg|max:2048',
         ], [
@@ -65,6 +81,13 @@ class SettingsController extends Controller
      */
     public function removeLogo()
     {
+        // Check if settings table exists
+        if (!Schema::hasTable('settings')) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Settings table does not exist. Please run the migration first.');
+        }
+
         try {
             $logoPath = Setting::get('platform_logo');
 
@@ -95,6 +118,13 @@ class SettingsController extends Controller
      */
     public function update(Request $request)
     {
+        // Check if settings table exists
+        if (!Schema::hasTable('settings')) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Settings table does not exist. Please run the migration first.');
+        }
+
         $request->validate([
             'platform_name' => 'nullable|string|max:255',
             'platform_tagline' => 'nullable|string|max:500',
@@ -129,6 +159,13 @@ class SettingsController extends Controller
      */
     public function updateEmailApi(Request $request)
     {
+        // Check if settings table exists
+        if (!Schema::hasTable('settings')) {
+            return redirect()
+                ->route('admin.settings.index')
+                ->with('error', 'Settings table does not exist. Please run the migration first.');
+        }
+
         $request->validate([
             'bravo_api_key' => 'nullable|string|max:255',
             'bravo_api_secret' => 'nullable|string|max:255',
