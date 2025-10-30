@@ -5,45 +5,68 @@
 app-C2rjbO7F.css:1 Failed to load resource: the server responded with a status of 404 ()
 ```
 
-## The Solution (30 seconds)
+## ✅ Solution: Build Before Push (Current Setup)
 
-**Run these commands on your server after EVERY git pull:**
+**Since your server doesn't have Node.js, we build assets locally and commit them to git.**
 
-```bash
-npm install
-npm run build
-```
+### On Your Local Machine (Before Pushing):
 
-That's it! This creates the CSS and JS files that your app needs.
-
----
-
-## Why This Happens
-
-- `public/build/` is in `.gitignore` (not committed to git)
-- When you pull code, the build files don't exist on the server
-- Laravel looks for files that aren't there → 404 error
-
----
-
-## One-Line Fix
-
-```bash
-npm install && npm run build && php artisan config:clear && php artisan cache:clear && php artisan view:clear
-```
-
----
-
-## Automated Script
-
-**Linux/Mac:**
-```bash
-bash deploy-server.sh
-```
-
-**Windows:**
+**Option 1: Use the automated script (Recommended)**
 ```batch
-deploy-server.bat
+build-and-push.bat
+```
+
+**Option 2: Manual steps**
+```bash
+npm run build
+git add .gitignore public/build/
+git commit -m "Build assets for production"
+git push
+```
+
+### On Your Server (After Pulling):
+
+**Just pull and clear caches:**
+```bash
+git pull origin ruwan-win
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+```
+
+**No need to run `npm run build` on the server!** The built files are already in git.
+
+---
+
+## Why This Works
+
+- ✅ `public/build/` is now committed to git (removed from `.gitignore`)
+- ✅ Built files are included in every push
+- ✅ Server just needs to pull code - no Node.js required
+- ✅ Laravel finds the built files immediately
+
+---
+
+## Alternative Solution (If Server Has Node.js)
+
+If your server had Node.js installed, you could:
+- Keep `public/build/` in `.gitignore`
+- Build on server after pulling code
+
+But since your server doesn't have Node.js, **building before push is the better approach!**
+
+---
+
+## Quick Reference
+
+**Before pushing code:**
+```batch
+build-and-push.bat
+```
+
+**On server after pulling:**
+```bash
+git pull && php artisan config:clear && php artisan cache:clear && php artisan view:clear
 ```
 
 ---
@@ -55,5 +78,5 @@ deploy-server.bat
 
 ---
 
-**Remember: Run `npm run build` on your server after every deployment!**
+**Remember: Run `build-and-push.bat` before pushing to git!**
 
