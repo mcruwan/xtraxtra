@@ -90,6 +90,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // FAQ management
     Route::resource('faqs', App\Http\Controllers\Admin\FaqController::class);
     
+    // Admin user management (only super admins can manage)
+    Route::resource('admin-users', App\Http\Controllers\Admin\AdminUserController::class)->names([
+        'index' => 'admin-users.index',
+        'create' => 'admin-users.create',
+        'store' => 'admin-users.store',
+        'show' => 'admin-users.show',
+        'edit' => 'admin-users.edit',
+        'update' => 'admin-users.update',
+        'destroy' => 'admin-users.destroy',
+    ]);
+    
     // Settings management
     Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
         ->name('settings.index');
