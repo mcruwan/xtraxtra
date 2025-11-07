@@ -51,8 +51,8 @@ class BrevoMailService
         try {
             $payload = [
                 'sender' => [
-                    'name' => $data['sender_name'] ?? config('mail.from.name', 'XtraXtra'),
-                    'email' => $data['sender_email'] ?? config('mail.from.address', 'noreply@xtraxtra.com'),
+                    'name' => $data['sender_name'] ?? config('mail.from.name', 'AppliedHE Xtra Xtra'),
+                    'email' => $data['sender_email'] ?? config('mail.from.address', 'info@appliedhe.com'),
                 ],
                 'to' => [
                     [
@@ -160,8 +160,8 @@ class BrevoMailService
             // Optional: Override sender
             if (isset($data['sender_name']) || isset($data['sender_email'])) {
                 $payload['sender'] = [
-                    'name' => $data['sender_name'] ?? config('mail.from.name', 'XtraXtra'),
-                    'email' => $data['sender_email'] ?? config('mail.from.address', 'noreply@xtraxtra.com'),
+                    'name' => $data['sender_name'] ?? config('mail.from.name', 'AppliedHE Xtra Xtra'),
+                    'email' => $data['sender_email'] ?? config('mail.from.address', 'info@appliedhe.com'),
                 ];
             }
 
