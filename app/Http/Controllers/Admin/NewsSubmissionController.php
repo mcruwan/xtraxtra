@@ -333,8 +333,10 @@ class NewsSubmissionController extends Controller
             'approved_at' => null,
         ]);
 
-        // Send notification to the university user who submitted the article
-        $newsSubmission->user->notify(new NewsSubmissionRejected($newsSubmission));
+        // Send rejection notification if enabled
+        if (Setting::get('enable_rejection_notifications', '1') == '1') {
+            $newsSubmission->user->notify(new NewsSubmissionRejected($newsSubmission));
+        }
 
         return redirect()
             ->back()

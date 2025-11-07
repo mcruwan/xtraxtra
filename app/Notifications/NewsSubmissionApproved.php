@@ -55,7 +55,7 @@ class NewsSubmissionApproved extends Notification implements ShouldQueue
     /**
      * Send email via Brevo API
      */
-    protected function sendViaBrevo(object $notifiable)
+    protected function sendViaBrevo(object $notifiable): MailMessage
     {
         $brevoService = new BrevoMailService();
         
@@ -80,17 +80,28 @@ class NewsSubmissionApproved extends Notification implements ShouldQueue
             'tags' => ['news-approval', 'notification'],
         ]);
 
-        if (!$result['success']) {
+        if ($result['success']) {
+            Log::info('Approval email sent successfully via Brevo', [
+                'user_id' => $notifiable->id,
+                'user_email' => $notifiable->email,
+                'news_submission_id' => $this->newsSubmission->id,
+            ]);
+        } else {
             Log::error('Failed to send approval email via Brevo', [
                 'user_id' => $notifiable->id,
                 'news_submission_id' => $this->newsSubmission->id,
                 'error' => $result['message'],
             ]);
+            
+            // If Brevo fails, fallback to Laravel mail
+            return $this->sendViaLaravelMail($notifiable);
         }
 
-        // Return a MailMessage for Laravel's notification system
-        // This won't actually send but will satisfy the interface
-        return $this->sendViaLaravelMail($notifiable);
+        // Create a dummy MailMessage to satisfy the interface
+        // The email was already sent via Brevo API
+        return (new MailMessage)
+            ->subject($subject)
+            ->line('This message was sent via Brevo API.');
     }
 
     /**
