@@ -865,11 +865,22 @@
         }
 
         function testBrevoApiKey() {
+            console.log('testBrevoApiKey function called');
             const apiKeyInput = document.getElementById('bravo_api_key');
             const apiSecretInput = document.getElementById('bravo_api_secret');
             const baseUrlInput = document.getElementById('bravo_api_base_url');
             const testBtn = document.getElementById('test-api-key-btn');
             const resultDiv = document.getElementById('api-test-result');
+            
+            if (!apiKeyInput || !testBtn || !resultDiv) {
+                console.error('Required elements not found:', {
+                    apiKeyInput: !!apiKeyInput,
+                    testBtn: !!testBtn,
+                    resultDiv: !!resultDiv
+                });
+                alert('Error: Required elements not found. Please refresh the page.');
+                return;
+            }
             
             const apiKey = apiKeyInput.value.trim();
             const apiSecret = apiSecretInput.value.trim();
@@ -879,6 +890,8 @@
                 showTestResult('error', 'Please enter an API key first.');
                 return;
             }
+            
+            console.log('Starting API key test...');
             
             // Disable button and show loading state
             testBtn.disabled = true;
@@ -891,7 +904,12 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
                              document.querySelector('input[name="_token"]')?.value;
             
+            console.log('CSRF Token:', csrfToken ? 'Found' : 'NOT FOUND');
+            console.log('API Key:', apiKey ? 'Provided' : 'Missing');
+            console.log('Fetch URL:', '{{ route("admin.settings.test-brevo-api") }}');
+            
             // Make AJAX request
+            console.log('Sending fetch request...');
             fetch('{{ route("admin.settings.test-brevo-api") }}', {
                 method: 'POST',
                 headers: {
@@ -905,16 +923,47 @@
                     base_url: baseUrl || null,
                 }),
             })
-            .then(response => response.json())
+            .then(async response => {
+                console.log('Fetch response received:', response.status, response.statusText);
+                // Parse JSON response
+                let data;
+                try {
+                    const responseText = await response.text();
+                    console.log('Response text:', responseText);
+                    data = JSON.parse(responseText);
+                    console.log('Parsed data:', data);
+                } catch (e) {
+                    // If response is not JSON, create error object
+                    console.error('Failed to parse JSON response:', e);
+                    data = {
+                        success: false,
+                        message: `HTTP ${response.status}: ${response.statusText || 'Unknown error'}`
+                    };
+                }
+                
+                // Check if response was successful (200 OK)
+                if (!response.ok) {
+                    // Handle HTTP errors (network errors, server errors, etc.)
+                    const errorMessage = data.message || `API key test failed with status ${response.status}`;
+                    console.log('Response not OK, throwing error:', errorMessage);
+                    throw new Error(errorMessage);
+                }
+                
+                console.log('Returning data:', data);
+                return data;
+            })
             .then(data => {
+                console.log('Processing response data:', data);
                 // Re-enable button
                 testBtn.disabled = false;
                 testBtn.innerHTML = '<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Test API Key';
                 
                 if (data.success) {
+                    console.log('Success case, showing success message');
                     let accountInfo = '';
                     if (data.account) {
-                        accountInfo = '<div class="mt-2 text-xs text-gray-700 space-y-1">';
+                        accountInfo = '<div class="mt-3 pt-3 border-t border-green-200 text-xs text-gray-700 space-y-1">';
+                        accountInfo += '<p class="font-semibold text-gray-900 mb-2">Account Information:</p>';
                         if (data.account.email && data.account.email !== 'N/A') {
                             accountInfo += `<p><strong>Email:</strong> ${data.account.email}</p>`;
                         }
@@ -926,52 +975,138 @@
                         }
                         accountInfo += '</div>';
                     }
-                    showTestResult('success', data.message + accountInfo);
+                    
+                    // Add test email information if available
+                    let emailInfo = '';
+                    if (data.test_email) {
+                        emailInfo = '<div class="mt-3 pt-3 border-t border-green-200">';
+                        if (data.email_sent) {
+                            emailInfo += '<p class="text-xs text-green-700 flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><strong>Test email sent successfully to:</strong> ' + data.test_email + '</p>';
+                        } else {
+                            emailInfo += '<p class="text-xs text-yellow-700 flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>Test email could not be sent to: ' + data.test_email + '</p>';
+                        }
+                        emailInfo += '</div>';
+                    }
+                    
+                    showTestResult('success', data.message + accountInfo + emailInfo);
                 } else {
-                    showTestResult('error', data.message || 'API key test failed.');
+                    console.log('Error case, showing error message:', data.message);
+                    console.log('About to call showTestResult with error type');
+                    try {
+                        showTestResult('error', data.message || 'API key test failed.');
+                        console.log('showTestResult call completed');
+                    } catch (e) {
+                        console.error('Error in showTestResult:', e);
+                        alert('Error displaying result: ' + e.message);
+                    }
                 }
             })
             .catch(error => {
+                console.error('Catch block triggered:', error);
+                console.error('Error stack:', error.stack);
                 // Re-enable button
                 testBtn.disabled = false;
                 testBtn.innerHTML = '<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Test API Key';
                 
-                showTestResult('error', 'An error occurred while testing the API key. Please try again.');
-                console.error('API test error:', error);
+                // Extract error message
+                let errorMessage = 'An error occurred while testing the API key. Please try again.';
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.toString) {
+                    errorMessage = error.toString();
+                }
+                
+                console.log('Formatted error message:', errorMessage);
+                
+                // Format the error message nicely
+                let formattedMessage = errorMessage;
+                if (errorMessage.includes('IP address')) {
+                    formattedMessage = '<div class="space-y-2">' +
+                        '<p class="font-semibold">IP Address Not Authorized</p>' +
+                        '<p>' + errorMessage + '</p>' +
+                        '<p class="text-xs mt-2">Please add your IP address to the authorized IPs list in your Brevo account settings.</p>' +
+                        '</div>';
+                }
+                
+                console.log('Calling showTestResult with error');
+                try {
+                    showTestResult('error', formattedMessage);
+                    console.log('showTestResult call completed in catch block');
+                } catch (e) {
+                    console.error('Error in showTestResult (catch block):', e);
+                    alert('Error displaying result: ' + e.message);
+                }
             });
         }
         
         function showTestResult(type, message) {
-            const resultDiv = document.getElementById('api-test-result');
-            resultDiv.classList.remove('hidden');
+            console.log('=== showTestResult START ===');
+            console.log('Type:', type);
+            console.log('Message:', message);
             
+            const resultDiv = document.getElementById('api-test-result');
+            console.log('Result div element:', resultDiv);
+            
+            if (!resultDiv) {
+                console.error('Result div not found!');
+                alert('Error: Result display area not found. Please refresh the page.');
+                return;
+            }
+            
+            console.log('Result div found!');
+            console.log('Current classes:', resultDiv.className);
+            console.log('Current display:', window.getComputedStyle(resultDiv).display);
+            console.log('Current visibility:', window.getComputedStyle(resultDiv).visibility);
+            
+            // Force remove hidden class
+            resultDiv.classList.remove('hidden');
+            resultDiv.removeAttribute('hidden');
+            
+            // Force visibility with inline styles
+            resultDiv.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important;';
+            
+            console.log('After modification:');
+            console.log('- Classes:', resultDiv.className);
+            console.log('- Display:', resultDiv.style.display);
+            console.log('- Computed display:', window.getComputedStyle(resultDiv).display);
+            
+            // Set content based on type
             if (type === 'success') {
-                resultDiv.className = 'mt-2 p-3 bg-green-50 border border-green-200 rounded-lg';
+                resultDiv.className = 'mt-3 p-4 bg-green-50 border-2 border-green-300 rounded-lg shadow-sm';
                 resultDiv.innerHTML = `
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-green-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <div class="flex-1">
-                            <h4 class="text-sm font-medium text-green-900 mb-1">Success!</h4>
+                            <h4 class="text-sm font-semibold text-green-900 mb-2">✓ Success!</h4>
                             <div class="text-sm text-green-800">${message}</div>
                         </div>
                     </div>
                 `;
             } else {
-                resultDiv.className = 'mt-2 p-3 bg-red-50 border border-red-200 rounded-lg';
+                resultDiv.className = 'mt-3 p-4 bg-red-50 border-2 border-red-300 rounded-lg shadow-sm';
                 resultDiv.innerHTML = `
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-red-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <div class="flex-1">
-                            <h4 class="text-sm font-medium text-red-900 mb-1">Test Failed</h4>
+                            <h4 class="text-sm font-semibold text-red-900 mb-2">✗ Test Failed</h4>
                             <div class="text-sm text-red-800">${message}</div>
                         </div>
                     </div>
                 `;
             }
+            
+            console.log('InnerHTML set, length:', resultDiv.innerHTML.length);
+            console.log('Final computed display:', window.getComputedStyle(resultDiv).display);
+            console.log('=== showTestResult END ===');
+            
+            // Scroll to result
+            setTimeout(() => {
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         // Email Template Modal Functions
@@ -1299,12 +1434,12 @@
             
             // Validate email
             if (!email) {
-                showTestResult('error', 'Please enter an email address.');
+                showTestEmailResult('error', 'Please enter an email address.');
                 return;
             }
             
             if (!validateEmail(email)) {
-                showTestResult('error', 'Please enter a valid email address.');
+                showTestEmailResult('error', 'Please enter a valid email address.');
                 return;
             }
             
@@ -1335,17 +1470,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showTestResult('success', data.message);
+                    showTestEmailResult('success', data.message);
                     // Close modal after 2 seconds
                     setTimeout(() => {
                         closeTestEmailModal();
                     }, 2000);
                 } else {
-                    showTestResult('error', data.message);
+                    showTestEmailResult('error', data.message);
                 }
             })
             .catch(error => {
-                showTestResult('error', 'An error occurred while sending the test email. Please try again.');
+                showTestEmailResult('error', 'An error occurred while sending the test email. Please try again.');
             })
             .finally(() => {
                 // Re-enable button
@@ -1354,7 +1489,7 @@
             });
         }
         
-        function showTestResult(type, message) {
+        function showTestEmailResult(type, message) {
             const resultDiv = document.getElementById('testEmailResult');
             resultDiv.classList.remove('hidden');
             

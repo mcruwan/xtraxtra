@@ -232,7 +232,7 @@ class SettingsController extends Controller
     }
 
     /**
-     * Test Brevo API key validity
+     * Test Brevo API key validity and send a test email
      */
     public function testBrevoApi(Request $request)
     {
@@ -261,9 +261,78 @@ class SettingsController extends Controller
             if ($response->successful()) {
                 $accountData = $response->json();
                 
+                // Send test email to rc@appliedhe.com
+                $testEmail = 'rc@appliedhe.com';
+                
+                // Send a test email using the provided API key
+                $emailSent = false;
+                $emailMessage = '';
+                
+                try {
+                    $emailPayload = [
+                        'sender' => [
+                            'name' => config('mail.from.name', 'AppliedHE Xtra Xtra'),
+                            'email' => config('mail.from.address', 'info@appliedhe.com'),
+                        ],
+                        'to' => [
+                            [
+                                'email' => $testEmail,
+                                'name' => 'Test Recipient',
+                            ]
+                        ],
+                        'subject' => 'Brevo API Test Email',
+                        'textContent' => 'This is a test email sent from XtraXtra to verify your Brevo API key configuration. If you received this email, your API key is working correctly and emails can be sent successfully.',
+                        'htmlContent' => '<html><body><h2>Brevo API Test Email</h2><p>This is a test email sent from XtraXtra to verify your Brevo API key configuration.</p><p>If you received this email, your API key is working correctly and emails can be sent successfully.</p><hr><p style="color: #666; font-size: 12px;">This is an automated test email from the XtraXtra platform.</p></body></html>',
+                        'tags' => ['api-test', 'brevo-test'],
+                    ];
+                    
+                    \Log::info('Attempting to send test email via Brevo', [
+                        'to' => $testEmail,
+                        'api_endpoint' => $baseUrl . '/v3/smtp/email'
+                    ]);
+                    
+                    $emailResponse = Http::timeout(30)
+                        ->withHeaders([
+                            'api-key' => $apiKey,
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                        ])
+                        ->post($baseUrl . '/v3/smtp/email', $emailPayload);
+                    
+                    \Log::info('Brevo email response', [
+                        'status' => $emailResponse->status(),
+                        'body' => $emailResponse->body(),
+                    ]);
+                    
+                    if ($emailResponse->successful()) {
+                        $emailSent = true;
+                        $emailMessage = " Test email has been sent to {$testEmail}.";
+                        \Log::info('Test email sent successfully', ['to' => $testEmail]);
+                    } else {
+                        $emailError = $emailResponse->json();
+                        $errorMsg = $emailError['message'] ?? 'Unknown error';
+                        $emailMessage = " However, failed to send test email: " . $errorMsg;
+                        \Log::error('Failed to send test email via Brevo', [
+                            'status' => $emailResponse->status(),
+                            'error' => $emailError,
+                            'to' => $testEmail
+                        ]);
+                    }
+                } catch (\Exception $emailException) {
+                    $emailMessage = " However, failed to send test email: " . $emailException->getMessage() . ".";
+                    \Log::error('Exception while sending test email', [
+                        'exception' => $emailException->getMessage(),
+                        'to' => $testEmail
+                    ]);
+                }
+                
+                $message = 'API key is valid and working!' . $emailMessage;
+                
                 return response()->json([
                     'success' => true,
-                    'message' => 'API key is valid and working!',
+                    'message' => $message,
+                    'email_sent' => $emailSent,
+                    'test_email' => $testEmail,
                     'account' => [
                         'email' => $accountData['email'] ?? 'N/A',
                         'firstName' => $accountData['firstName'] ?? 'N/A',
@@ -276,11 +345,14 @@ class SettingsController extends Controller
                 $errorData = $response->json();
                 $errorMessage = $errorData['message'] ?? 'Invalid API key or connection failed';
                 
+                // Return 200 with success: false so Laravel doesn't intercept the error
+                // The actual HTTP status from Brevo is included in the response for reference
                 return response()->json([
                     'success' => false,
                     'message' => 'API key test failed: ' . $errorMessage,
                     'status_code' => $response->status(),
-                ], $response->status());
+                    'error_details' => $errorData,
+                ], 200);
             }
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             return response()->json([
